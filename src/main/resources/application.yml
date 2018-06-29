@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url:  jdbc:mysql://127.0.0.1:3306/aloha
+    username: root
+    password: your_password
+    driverClassName: com.mysql.jdbc.Driver
+  tomcat:
+          uri-encoding: UTF-8
