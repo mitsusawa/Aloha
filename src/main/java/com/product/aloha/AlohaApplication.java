@@ -15,6 +15,12 @@ public class AlohaApplication {
 		return "index";
 	}
 	
+	
+	@RequestMapping(value = {"/bootstrap"})
+	public String bootstrap() {
+		return "bootstrap";
+	}
+	
 	public static void main(String[] args) {
 		SpringApplication.run(AlohaApplication.class, args);
 	}
