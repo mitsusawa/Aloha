@@ -1,5 +1,7 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" errorPage="./error.jsp" session="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="f" uri="http://www.springframework.org/tags/form" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -90,12 +92,6 @@
 							<a class="dropdown-item" href="./bootstrap.html">English Page</a>
 						</div>
 					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="http://github.com/windyakin/Aloha/releases">Download</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="http://github.com/windyakin/Aloha/wiki">Wiki</a>
-					</li>
 				</ul>
 			</div>
 		</div>
@@ -114,15 +110,23 @@
 			</div>
 		</div>
 	</div>
+	<div class="col-lg-4">
+		<div class="bs-component">
+			<div class="alert alert-dismissible alert-info">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+				<strong>Info</strong> ようこそ <a href="#" class="alert-link"><c:out value="${loginName}" /></a> さん
+			</div>
+		</div>
+	</div>
+</div>
 
-
-	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-	        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-	        crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-	        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-	        crossorigin="anonymous"></script>
-	<script src="./js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="./js/bootstrap.min.js"></script>
 
 </body>
 </html>

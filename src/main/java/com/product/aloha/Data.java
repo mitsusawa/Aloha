@@ -17,4 +17,27 @@ public class Data {
 	public Long getId() {
 		return id;
 	}
+	@Column(length = 32, nullable = true)
+	private String userName;
+	
+	@Column(length = 1024, nullable = true)
+	private String password;
+	
+	public String getUserName(){
+		return userName;
+	}
+	
+	public String getPassword(){
+		return password;
+	}
+	
+	public void setUserName(String name){
+		userName = name;
+		return;
+	}
+	
+	public void setPassword(String pass){
+		password = pass;
+		return;
+	}
 }
