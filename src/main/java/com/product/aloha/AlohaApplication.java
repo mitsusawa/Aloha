@@ -26,8 +26,9 @@ public class AlohaApplication {
 		SpringApplication.run(AlohaApplication.class, args);
 	}
 	
-	@RequestMapping(value = {"/", "/index"})
-	public String index() {
+	@RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
+	public String index(Model model) {
+		model.addAttribute("loginName", "ゲスト");
 		return "index";
 	}
 	
@@ -55,18 +56,19 @@ public class AlohaApplication {
 	
 	@RequestMapping(value = {"/signup"}, method = RequestMethod.POST)
 	@Transactional(readOnly = false)
-	public String signupExec(Model model, @ModelAttribute("signupForm") SignupForm signupForm, ModelAndView mav, Data data) {
+	public String signupExec(Model model, @ModelAttribute("signupForm") SignupForm signupForm, ModelAndView mav) {
+		Data data = new Data();
 		data.setUserName(signupForm.getSighupUserName());
 		data.setPassword(signupForm.getSighupPassword());
 		repository.saveAndFlush(data);
-		model.addAttribute("loginName", signupForm.getSighupUserName());
+		model.addAttribute("loginName", data.getUserName());
 		return "index";
 	}
 	
 	@PostConstruct
 	public void init() {
 		Data data = new Data();
-		data.setUserName("ゲスト");
+		data.setUserName("guest");
 		data.setPassword("dummy");
 		repository.saveAndFlush(data);
 	}
@@ -76,6 +78,6 @@ public class AlohaApplication {
 class DbTest {
 	@RequestMapping(value = {"/db"})
 	public String db(Data data) {
-		return (data.getUserName().toString());
+		return (data.getId().toString());
 	}
 }
