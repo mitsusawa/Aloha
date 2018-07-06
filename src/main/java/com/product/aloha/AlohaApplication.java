@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -23,8 +28,16 @@ public class AlohaApplication {
 	DataRepository repository;
 	
 	@Autowired
+	PasswordEncoder passwordEncoder;
+	
+	@Autowired
 	public AlohaApplication(DataRepository repository) {
 		this.repository = repository;
+	}
+	
+	@Bean
+	PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
 	}
 	
 	public static void main(String[] args) {
@@ -47,7 +60,7 @@ public class AlohaApplication {
 	public String loginExec(Model model, @ModelAttribute("loginForm") LoginForm loginForm) {
 		try {
 			List<Data> data = repository.findByUserName(loginForm.getLoginUserName());
-			if (data.get(0).getPassword().equals(loginForm.getLoginPassword())) {
+			if (data.get(0).getPassword().equals(passwordEncoder.encode(loginForm.getLoginPassword()))) {
 				model.addAttribute("loggedinName", loginForm.getLoginUserName());
 				return "index";
 			} else {
@@ -72,10 +85,10 @@ public class AlohaApplication {
 	@Transactional(readOnly = false)
 	public String signupExec(Model model, @ModelAttribute("signupForm") SignupForm signupForm) {
 		Data data = new Data();
-		data.setUserName(signupForm.getSighupUserName());
-		data.setPassword(signupForm.getSighupPassword());
+		data.setUserName(signupForm.getSignupUserName());
+		data.setPassword(passwordEncoder.encode(signupForm.getSignupPassword()));
 		repository.saveAndFlush(data);
-		model.addAttribute("loggedinName", signupForm.getSighupUserName());
+		model.addAttribute("loggedinName", signupForm.getSignupUserName());
 		return "index";
 	}
 	

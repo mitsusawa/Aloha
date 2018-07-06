@@ -3,27 +3,27 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 public class SignupForm {
-	public String getSighupUserName() {
-		return sighupUserName;
+	public String getSignupUserName() {
+		return signupUserName;
 	}
 	
-	public void setSighupUserName(String sighupUserName) {
-		this.sighupUserName = sighupUserName;
+	public void setSignupUserName(String signupUserName) {
+		this.signupUserName = signupUserName;
 	}
 	
-	public String getSighupPassword() {
-		return sighupPassword;
+	public String getSignupPassword() {
+		return signupPassword;
 	}
 	
-	public void setSighupPassword(String sighupPassword) {
-		this.sighupPassword = sighupPassword;
+	public void setSignupPassword(String signupPassword) {
+		this.signupPassword = signupPassword;
 	}
 	
 	@NotNull
 	@Size(min = 1, max = 32)
-	private String sighupUserName;
+	private String signupUserName;
 	
 	@NotNull
 	@Size(min = 1, max = 32)
-	private String sighupPassword;
+	private String signupPassword;
 }
