@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"  errorPage="./error.jsp" session="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<%@ taglib prefix="f" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -72,7 +72,7 @@
 		<div class="col-md-3 col-lg-3"></div>
 		<div class="col-md-6 col-lg-6">
 			<div class="well well-sm">
-				<f:form modelAttribute="loginForm" method="post" action="@{'/login'}">
+				<form:form modelAttribute="loginForm" method="post" action="/login">
 					<fieldset id="login_field">
 						<div class="form-group">
 							<label>ユーザID</label>
@@ -87,9 +87,9 @@
 						<div class="form-group">
 							<input id="login_button" type="submit" value="ログイン"/>
 						</div>
+						<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 					</fieldset>
-					<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-				</f:form>
+				</form:form>
 			</div>
 		</div>
 		<div class="col-md-3 col-lg-3"></div>

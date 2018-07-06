@@ -11,16 +11,21 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 @SpringBootApplication
 @Controller
 
 public class AlohaApplication {
-	@Autowired
+	final
 	DataRepository repository;
+	
+	@Autowired
+	public AlohaApplication(DataRepository repository) {
+		this.repository = repository;
+	}
 	
 	public static void main(String[] args) {
 		SpringApplication.run(AlohaApplication.class, args);
@@ -28,7 +33,7 @@ public class AlohaApplication {
 	
 	@RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
 	public String index(Model model) {
-		model.addAttribute("loginName", "ゲスト");
+		model.addAttribute("loggedinName", "ゲスト");
 		return "index";
 	}
 	
@@ -40,8 +45,17 @@ public class AlohaApplication {
 	
 	@RequestMapping(value = {"/login"}, method = RequestMethod.POST)
 	public String loginExec(Model model, @ModelAttribute("loginForm") LoginForm loginForm) {
-		model.addAttribute("loginName", loginForm.getLoginUserName());
-		return "index";
+		try {
+			List<Data> data = repository.findByUserName(loginForm.getLoginUserName());
+			if (data.get(0).getPassword().equals(loginForm.getLoginPassword())) {
+				model.addAttribute("loggedinName", loginForm.getLoginUserName());
+				return "index";
+			} else {
+				return "login";
+			}
+		} catch (Exception e) {
+			return "login";
+		}
 	}
 	
 	@RequestMapping(value = {"/login"}, method = RequestMethod.GET)
@@ -50,18 +64,18 @@ public class AlohaApplication {
 	}
 	
 	@RequestMapping(value = {"/signup"}, method = RequestMethod.GET)
-	public String signUp() {
+	public String signup() {
 		return "signup";
 	}
 	
 	@RequestMapping(value = {"/signup"}, method = RequestMethod.POST)
 	@Transactional(readOnly = false)
-	public String signupExec(Model model, @ModelAttribute("signupForm") SignupForm signupForm, ModelAndView mav) {
+	public String signupExec(Model model, @ModelAttribute("signupForm") SignupForm signupForm) {
 		Data data = new Data();
 		data.setUserName(signupForm.getSighupUserName());
 		data.setPassword(signupForm.getSighupPassword());
 		repository.saveAndFlush(data);
-		model.addAttribute("loginName", data.getUserName());
+		model.addAttribute("loggedinName", signupForm.getSighupUserName());
 		return "index";
 	}
 	
@@ -71,6 +85,18 @@ public class AlohaApplication {
 		data.setUserName("guest");
 		data.setPassword("dummy");
 		repository.saveAndFlush(data);
+	}
+	
+	@ModelAttribute("signupForm")
+	public SignupForm signupForm() {
+		SignupForm signupForm = new SignupForm();
+		return signupForm;
+	}
+	
+	@ModelAttribute("loginForm")
+	public LoginForm loginForm() {
+		LoginForm loginForm = new LoginForm();
+		return loginForm;
 	}
 }
 

@@ -114,7 +114,7 @@
 		<div class="bs-component">
 			<div class="alert alert-dismissible alert-info">
 				<button type="button" class="close" data-dismiss="alert">&times;</button>
-				<strong>Info</strong> ようこそ <a href="#" class="alert-link"><c:out value="${loginName}" /></a> さん
+				<strong>Info</strong> ようこそ <a href="#" class="alert-link"><c:out value="${loggedinName}" /></a> さん
 			</div>
 		</div>
 	</div>

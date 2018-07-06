@@ -20,7 +20,7 @@ public class Data {
 	@Column(length = 32, nullable = true)
 	private String userName;
 	
-	@Column(length = 1024, nullable = true)
+	@Column(length = 32, nullable = true)
 	private String password;
 	
 	public String getUserName(){
