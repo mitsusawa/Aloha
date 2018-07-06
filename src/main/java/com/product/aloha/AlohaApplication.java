@@ -60,7 +60,7 @@ public class AlohaApplication {
 	public String loginExec(Model model, @ModelAttribute("loginForm") LoginForm loginForm) {
 		try {
 			List<Data> data = repository.findByUserName(loginForm.getLoginUserName());
-			if (data.get(0).getPassword().equals(passwordEncoder.encode(loginForm.getLoginPassword()))) {
+			if (passwordEncoder.matches((loginForm.getLoginPassword()), data.get(0).getPassword())) {
 				model.addAttribute("loggedinName", loginForm.getLoginUserName());
 				return "index";
 			} else {
@@ -88,8 +88,17 @@ public class AlohaApplication {
 		data.setUserName(signupForm.getSignupUserName());
 		data.setPassword(passwordEncoder.encode(signupForm.getSignupPassword()));
 		repository.saveAndFlush(data);
-		model.addAttribute("loggedinName", signupForm.getSignupUserName());
-		return "index";
+		try {
+			List<Data> dataList = repository.findByUserName(signupForm.getSignupUserName());
+			if (passwordEncoder.matches(signupForm.getSignupPassword(), dataList.get(0).getPassword())) {
+				model.addAttribute("loggedinName", dataList.get(0).getUserName());
+				return "index";
+			} else {
+				return "signup";
+			}
+		} catch (Exception e) {
+			return "signup";
+		}
 	}
 	
 	@PostConstruct
