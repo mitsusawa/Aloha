@@ -85,11 +85,11 @@
 					<li class="nav-item dropdown active">
 						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
 						   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							Live demo
+							Menu
 						</a>
 						<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-							<a class="dropdown-item" href="./bootstrap-ja.html">Japanese Page</a>
-							<a class="dropdown-item" href="./bootstrap.html">English Page</a>
+							<a class="dropdown-item" href="./login">Login Page</a>
+							<a class="dropdown-item" href="./signup">SignUp Page</a>
 						</div>
 					</li>
 				</ul>
@@ -114,7 +114,7 @@
 		<div class="bs-component">
 			<div class="alert alert-dismissible alert-info">
 				<button type="button" class="close" data-dismiss="alert">&times;</button>
-				<strong>Info</strong> ようこそ <a href="#" class="alert-link"><c:out value="${loggedinName}" /></a> さん
+				ようこそ <a href="#" class="alert-link"><c:out value="${loggedinName}" /></a> さん
 			</div>
 		</div>
 	</div>

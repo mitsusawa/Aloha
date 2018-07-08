@@ -1,4 +1,5 @@
 package com.product.aloha;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -19,11 +20,11 @@ public class LoginForm {
 		this.loginPassword = loginPassword;
 	}
 	
-	@NotNull
-	@Size(min = 1, max = 32)
+	@NotEmpty
+	@Size(min = 2, max = 32)
 	private String loginUserName;
 	
-	@NotNull
-	@Size(min = 1, max = 32)
+	@NotEmpty
+	@Size(min = 4, max = 32)
 	private String loginPassword;
 }
