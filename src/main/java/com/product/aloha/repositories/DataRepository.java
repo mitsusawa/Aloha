@@ -12,4 +12,5 @@ public interface DataRepository extends JpaRepository<Data, Long> {
 	public Optional<Data> findById(Long id);
 	public List<Data> findByUserName(String name);
 	public List<Data> findByUserNameLike(String name);
+	public <T> T findOneByUserName(String name, Class<T> type);
 }

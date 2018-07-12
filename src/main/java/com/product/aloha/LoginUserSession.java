@@ -10,6 +10,16 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 @Component
 @Scope(value="session", proxyMode=ScopedProxyMode.TARGET_CLASS)
 public class LoginUserSession {
+	public Data getData() {
+		return data;
+	}
+	
+	public void setData(Data data) {
+		this.data = data;
+	}
+	
+	public Data data;
+	
 	public boolean isLoggedIn() {
 		return loggedIn;
 	}
@@ -33,6 +43,7 @@ public class LoginUserSession {
 	public LoginUserSession setLoginUserSession(LoginUserSession loginUserSession) {
 		return loginUserSession;
 	}
+	
 	public LoginUserSession(){
 		loggedIn = false;
 		loggedInName = "";

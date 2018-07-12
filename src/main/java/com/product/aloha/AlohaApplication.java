@@ -1,7 +1,6 @@
 package com.product.aloha;
 
 import com.product.aloha.repositories.DataRepository;
-import org.dom4j.rule.Mode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,7 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.HtmlUtils;
 
-import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @SpringBootApplication
@@ -51,11 +51,11 @@ public class AlohaApplication {
 	
 	@RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
 	public String index(Model model) {
-		if(!loginUserSession.isLoggedIn()) {
-			model.addAttribute("loggedinName", "ゲスト");
+		if (!loginUserSession.isLoggedIn()) {
+			model.addAttribute("loggedInName", "ゲスト");
 			return "index";
-		}else{
-			model.addAttribute("loggedinName", loginUserSession.getLoggedInName());
+		} else {
+			model.addAttribute("loggedInName", loginUserSession.getLoggedInName());
 			return "index";
 		}
 	}
@@ -82,9 +82,15 @@ public class AlohaApplication {
 	}
 	
 	@RequestMapping(value = {"/login"}, method = RequestMethod.GET)
-	public String login() {
-		return "login";
+	public String login(Model model) {
+		if (!loginUserSession.isLoggedIn()) {
+			return "login";
+		} else {
+			model.addAttribute("loggedInName", loginUserSession.getLoggedInName());
+			return "index";
+		}
 	}
+	
 	@RequestMapping(value = {"/logout"})
 	public String logout() {
 		loginUserSession = new LoginUserSession();
@@ -92,22 +98,27 @@ public class AlohaApplication {
 	}
 	
 	@RequestMapping(value = {"/signup"}, method = RequestMethod.GET)
-	public String signup() {
-		return "signup";
+	public String signUp(Model model) {
+		if (!loginUserSession.isLoggedIn()) {
+			return "signup";
+		} else {
+			model.addAttribute("loggedInName", loginUserSession.getLoggedInName());
+			return "index";
+		}
 	}
 	
 	@RequestMapping(value = {"/signup"}, method = RequestMethod.POST)
 	@Transactional(readOnly = false)
-	public String signupExec(Model model, @ModelAttribute("signupForm") @Validated SignupForm signupForm, BindingResult result) {
-		String safeSignupUserName = HtmlUtils.htmlEscape(signupForm.getSignupUserName());
-		String safeSignupPassword = HtmlUtils.htmlEscape(signupForm.getSignupPassword());
-		List<Data> searchedData = repository.findByUserName(safeSignupUserName);
+	public String signUpExec(Model model, @ModelAttribute("signUpForm") @Validated SignUpForm signUpForm, BindingResult result) {
+		String safeSignUpUserName = HtmlUtils.htmlEscape(signUpForm.getSignUpUserName());
+		String safeSignUpPassword = HtmlUtils.htmlEscape(signUpForm.getSignUpPassword());
+		List<Data> searchedData = repository.findByUserName(safeSignUpUserName);
 		if (searchedData.size() == 0) {
 			Data data = new Data();
-			data.setUserName(safeSignupUserName);
-			data.setPassword(passwordEncoder.encode(safeSignupPassword));
+			data.setUserName(safeSignUpUserName);
+			data.setPassword(passwordEncoder.encode(safeSignUpPassword));
 			repository.saveAndFlush(data);
-			if (loginAuth(safeSignupUserName, safeSignupPassword)) {
+			if (loginAuth(safeSignUpUserName, safeSignUpPassword)) {
 				return "redirect:/index";
 			} else {
 				return "signup";
@@ -124,6 +135,7 @@ public class AlohaApplication {
 				loginUserSession.setLoginUserSession(loginUserSession);
 				loginUserSession.setLoggedIn(true);
 				loginUserSession.setLoggedInName(loginUserName);
+				loginUserSession.setData(repository.findOneByUserName(loginUserSession.loggedInName, Data.class));
 				return true;
 			} else {
 				return false;
@@ -131,6 +143,66 @@ public class AlohaApplication {
 		} else {
 			return false;
 		}
+	}
+	
+	@RequestMapping(value = {"/makeup"}, method = RequestMethod.GET)
+	public String makeUp() {
+		if (loginUserSession.isLoggedIn()) {
+			return "makeup";
+		} else {
+			return "redirect:/index";
+		}
+	}
+	
+	@RequestMapping(value = {"/makeup"}, method = RequestMethod.POST)
+	@Transactional(readOnly = false)
+	public String makeUpExec(Model model, @ModelAttribute("makeUpForm") @Validated MakeUpForm makeUpForm, BindingResult result) {
+		if (loginUserSession.isLoggedIn()) {
+			String safeMakeUpTableName = HtmlUtils.htmlEscape(makeUpForm.getMakeUpTableName());
+			List<Data> searchedData = repository.findByUserName(loginUserSession.loggedInName);
+			if (searchedData.size() > 0) {
+				Data data = loginUserSession.getData();
+				data.getTimeTableArray().add(new TimeTable());
+				int tableNum;
+				if (data.getTimeTableArray().isEmpty()) {
+					data.setTimeTableArray(new ArrayList<TimeTable>());
+					data.getTimeTableArray().add(new TimeTable());
+					tableNum = 0;
+				} else {
+					tableNum = data.getTimeTableArray().size();
+					data.getTimeTableArray().add(new TimeTable());
+				}
+				data.getTimeTableArray().get(tableNum).setId(tableNum);
+				data.getTimeTableArray().get(tableNum).setDividedNum(makeUpForm.getDivideNum());
+				data.getTimeTableArray().get(tableNum).setTableName(safeMakeUpTableName);
+				data.getTimeTableArray().get(tableNum).setTable(new ArrayList<>(data.getTimeTableArray().get(tableNum).getDividedNum()));
+				Collections.fill(data.getTimeTableArray().get(tableNum).getTable(), new String[7]);
+				repository.saveAndFlush(data);
+				return "index";
+			} else {
+				return "makeup";
+			}
+		} else {
+			return "makeup";
+		}
+	}
+	
+	@ModelAttribute("signUpForm")
+	public SignUpForm signUpForm() {
+		SignUpForm signUpForm = new SignUpForm();
+		return signUpForm;
+	}
+	
+	@ModelAttribute("loginForm")
+	public LoginForm loginForm() {
+		LoginForm loginForm = new LoginForm();
+		return loginForm;
+	}
+	
+	@ModelAttribute("makeUpForm")
+	public MakeUpForm makeUpForm() {
+		MakeUpForm makeUpForm = new MakeUpForm();
+		return makeUpForm;
 	}
 	
 	/*
@@ -142,18 +214,6 @@ public class AlohaApplication {
 		repository.saveAndFlush(data);
 	}
 	*/
-	
-	@ModelAttribute("signupForm")
-	public SignupForm signupForm() {
-		SignupForm signupForm = new SignupForm();
-		return signupForm;
-	}
-	
-	@ModelAttribute("loginForm")
-	public LoginForm loginForm() {
-		LoginForm loginForm = new LoginForm();
-		return loginForm;
-	}
 }
 
 @RestController

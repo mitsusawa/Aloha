@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
-<%@ taglib prefix="f" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -114,12 +114,11 @@
 		<div class="bs-component">
 			<div class="alert alert-dismissible alert-info">
 				<button type="button" class="close" data-dismiss="alert">&times;</button>
-				ようこそ <a href="#" class="alert-link"><c:out value="${loggedinName}" /></a> さん
+				ようこそ <a href="#" class="alert-link"><c:out value="${loggedInName}" /></a> さん
 			</div>
 		</div>
 	</div>
 </div>
-
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
         crossorigin="anonymous"></script>

@@ -88,7 +88,6 @@
 							Menu
 						</a>
 						<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-							<a class="dropdown-item" href="./index">Top Page</a>
 							<a class="dropdown-item" href="./signup">SignUp Page</a>
 						</div>
 					</li>

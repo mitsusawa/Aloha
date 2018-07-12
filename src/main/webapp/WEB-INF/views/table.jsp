@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" errorPage="./error.jsp" session="true" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
@@ -8,7 +8,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-	<title>新規登録</title>
+	<title>Aloha</title>
 
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
 	<style type="text/css">
@@ -89,6 +89,7 @@
 						</a>
 						<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 							<a class="dropdown-item" href="./login">Login Page</a>
+							<a class="dropdown-item" href="./signup">SignUp Page</a>
 						</div>
 					</li>
 				</ul>
@@ -98,38 +99,18 @@
 </header>
 
 <div class="container">
-	<div class="row">
-		<p>
-		<h1 id="title">新規登録</h1></p>
-	</div>
-	<div class="row">
-		<div class="col-md-3 col-lg-3"></div>
-		<div class="col-md-6 col-lg-6">
-			<div class="well well-sm">
-				<form:form modelAttribute="signUpForm" method="post" action="/signup">
-					<fieldset id="signUp_field">
-						<div class="form-group">
-							<label>ユーザID</label>
-							<input type="text" class="form-control" id="signUpUserName" name="signUpUserName"
-							       placeholder="ログインIDを入力してください" autofocus="" required=""/>
-						</div>
-						<div class="form-group">
-							<label>パスワード</label>
-							<input type="password" class="form-control" id="signUpPassword" name="signUpPassword"
-							       placeholder="パスワードを入力してください" required=""/>
-						</div>
-						<div class="form-group">
-							<input id="signUp_button" type="submit" value="ログイン"/>
-						</div>
-						<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-					</fieldset>
-				</form:form>
+
+	<div class="page-header" id="banner">
+		<div class="row my-4">
+			<div class="col-12">
+				<h1 class="display-3">Aloha</h1>
+				<p class="lead">時間割管理サイト</p>
+				<hr>
+				<p>Aloha</p>
 			</div>
 		</div>
-		<div class="col-md-3 col-lg-3"></div>
 	</div>
 </div>
-
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
         crossorigin="anonymous"></script>
