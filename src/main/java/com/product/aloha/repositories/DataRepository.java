@@ -1,6 +1,6 @@
 package com.product.aloha.repositories;
 
-import com.product.aloha.Data;
+import com.product.aloha.Data.Data;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
@@ -14,3 +14,4 @@ public interface DataRepository extends JpaRepository<Data, Long> {
 	public List<Data> findByUserNameLike(String name);
 	public <T> T findOneByUserName(String name, Class<T> type);
 }
+

@@ -88,8 +88,7 @@
 							Menu
 						</a>
 						<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-							<a class="dropdown-item" href="./login">Login Page</a>
-							<a class="dropdown-item" href="./signup">SignUp Page</a>
+							<a class="dropdown-item" href="./logout">Logout</a>
 						</div>
 					</li>
 				</ul>
@@ -99,17 +98,43 @@
 </header>
 
 <div class="container">
+	<section class="bs-docs-section">
 
-	<div class="page-header" id="banner">
-		<div class="row my-4">
-			<div class="col-12">
-				<h1 class="display-3">Aloha</h1>
-				<p class="lead">時間割管理サイト</p>
-				<hr>
-				<p>Aloha</p>
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="page-header">
+					<h1 id="tables"><c:out value="${tableName}" /></h1>
+				</div>
+
+				<div class="bs-component">
+					<table class="table table-hover">
+						<thead>
+						<tr>
+							<th scope="col"><font color="red">日</font></th>
+							<th scope="col">月</th>
+							<th scope="col">火</th>
+							<th scope="col">水</th>
+							<th scope="col">木</th>
+							<th scope="col">金</th>
+							<th scope="col"><font color="blue">土</font></th>
+						</tr>
+						</tbody>
+						<c:forEach items="${table}" var="list">
+							<thead>
+							<tr>
+							<c:forEach items="${list.table}" var="item">
+								<th scope="col"><c:out value="${item}" /></th>
+							</c:forEach>
+							</tr>
+							</tbody>
+						</c:forEach>
+
+
+					</table>
+				</div><!-- /example -->
 			</div>
 		</div>
-	</div>
+	</section>
 </div>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"

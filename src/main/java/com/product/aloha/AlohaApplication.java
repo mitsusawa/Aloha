@@ -1,6 +1,11 @@
 package com.product.aloha;
 
+import com.product.aloha.Data.Data;
+import com.product.aloha.Data.Lesson;
+import com.product.aloha.Data.TimeTable;
 import com.product.aloha.repositories.DataRepository;
+import com.product.aloha.repositories.LessonRepository;
+import com.product.aloha.repositories.TimeTableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,12 +20,13 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.HtmlUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @SpringBootApplication
 @Controller
@@ -31,6 +37,12 @@ public class AlohaApplication {
 	LoginUserSession loginUserSession;
 	
 	final DataRepository repository;
+	
+	@Autowired
+	private TimeTableRepository timeTableRepository;
+	
+	@Autowired
+	private LessonRepository lessonRepository;
 	
 	@Autowired
 	PasswordEncoder passwordEncoder;
@@ -154,34 +166,45 @@ public class AlohaApplication {
 		}
 	}
 	
+	@RequestMapping(value = {"/table"}, method = RequestMethod.GET)
+	public String table(Model model, @RequestParam("requirednum") int requirdNum) {
+		if (loginUserSession.isLoggedIn()) {
+			if(Objects.isNull(loginUserSession.getData())) {
+				loginUserSession.setData(repository.findOneByUserName(loginUserSession.getLoggedInName(), Data.class));
+			}
+			Data data = loginUserSession.getData();
+			try {
+				model.addAttribute("table", data.getTimeTableArray().get(requirdNum).getTable());
+				model.addAttribute("tableName", data.getTimeTableArray().get(requirdNum).getTableName());
+			} catch (Exception e) {
+				return "redirect:/index";
+			}
+			return "table";
+		} else {
+			return "redirect:/index";
+		}
+	}
+	
 	@RequestMapping(value = {"/makeup"}, method = RequestMethod.POST)
 	@Transactional(readOnly = false)
 	public String makeUpExec(Model model, @ModelAttribute("makeUpForm") @Validated MakeUpForm makeUpForm, BindingResult result) {
 		if (loginUserSession.isLoggedIn()) {
 			String safeMakeUpTableName = HtmlUtils.htmlEscape(makeUpForm.getMakeUpTableName());
-			List<Data> searchedData = repository.findByUserName(loginUserSession.loggedInName);
-			if (searchedData.size() > 0) {
-				Data data = loginUserSession.getData();
-				data.getTimeTableArray().add(new TimeTable());
-				int tableNum;
-				if (data.getTimeTableArray().isEmpty()) {
-					data.setTimeTableArray(new ArrayList<TimeTable>());
-					data.getTimeTableArray().add(new TimeTable());
-					tableNum = 0;
-				} else {
-					tableNum = data.getTimeTableArray().size();
-					data.getTimeTableArray().add(new TimeTable());
-				}
-				data.getTimeTableArray().get(tableNum).setId(tableNum);
-				data.getTimeTableArray().get(tableNum).setDividedNum(makeUpForm.getDivideNum());
-				data.getTimeTableArray().get(tableNum).setTableName(safeMakeUpTableName);
-				data.getTimeTableArray().get(tableNum).setTable(new ArrayList<>(data.getTimeTableArray().get(tableNum).getDividedNum()));
-				Collections.fill(data.getTimeTableArray().get(tableNum).getTable(), new String[7]);
-				repository.saveAndFlush(data);
-				return "index";
-			} else {
-				return "makeup";
+			loginUserSession.setData(repository.findOneByUserName(loginUserSession.getLoggedInName(), Data.class));
+			Data data = loginUserSession.getData();
+			int tableNum;
+			if (Objects.isNull(data.getTimeTableArray())) {
+				data.setTimeTableArray(new ArrayList<TimeTable>());
 			}
+			tableNum = data.getTimeTableArray().size();
+			data.getTimeTableArray().add(new TimeTable());
+			data.getTimeTableArray().get(tableNum).setDividedNum(makeUpForm.getDivideNum());
+			data.getTimeTableArray().get(tableNum).setTableName(safeMakeUpTableName);
+			data.getTimeTableArray().get(tableNum).setTable(new ArrayList<>(data.getTimeTableArray().get(tableNum).getDividedNum()));
+			Collections.fill(data.getTimeTableArray().get(tableNum).getTable(), new Lesson[7]);
+			timeTableRepository.save(data.getTimeTableArray().get(tableNum));
+			repository.saveAndFlush(data);
+			return "redirect:/table?requirednum=" + tableNum;
 		} else {
 			return "makeup";
 		}
@@ -214,12 +237,4 @@ public class AlohaApplication {
 		repository.saveAndFlush(data);
 	}
 	*/
-}
-
-@RestController
-class DbTest {
-	@RequestMapping(value = {"/db"})
-	public String db(Data data) {
-		return (data.getId().toString());
-	}
 }
