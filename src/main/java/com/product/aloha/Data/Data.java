@@ -1,22 +1,26 @@
 package com.product.aloha.Data;
 
-import java.util.List;
-import java.util.ArrayList;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "data")
 public class Data {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column
+	@Column(nullable = false, unique = true)
 	@NotNull
 	private Long id;
+	
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	public Long getId() {
 		return id;
 	}
+	
 	@Column(length = 32, nullable = true)
 	@NotEmpty
 	private String userName;
@@ -26,10 +30,6 @@ public class Data {
 	
 	private String password;
 	
-	public void setId(long id) {
-		this.id = id;
-	}
-	
 	public List<TimeTable> getTimeTableArray() {
 		return timeTableArray;
 	}
@@ -38,25 +38,42 @@ public class Data {
 		this.timeTableArray = timeTableArray;
 	}
 	
-	@OneToMany(targetEntity = TimeTable.class)
+	public void setTimeTableArray(List<TimeTable> timeTableArray) {
+		this.timeTableArray = timeTableArray;
+	}
+	
+	public Data() {
+		if (Objects.isNull(getTimeTableArray())){
+			setTimeTableArray(new ArrayList<TimeTable>());
+		}
+	}
+	
+	@ElementCollection(targetClass = TimeTable.class)
+	@CollectionTable(name="data_time_table_array",joinColumns = @JoinColumn(name = "data_time_table_id", nullable = true))
+	@Column(name="data_time_table")
+	@Embedded
 	private List<TimeTable> timeTableArray;
 	
-	public String getUserName(){
+	public String getUserName() {
 		return userName;
 	}
 	
-	public String getPassword(){
+	public String getPassword() {
 		return password;
 	}
 	
-	public void setUserName(String name){
+	public void setUserName(String name) {
 		userName = name;
 		return;
 	}
 	
-	public void setPassword(String pass){
+	public void setPassword(String pass) {
 		password = pass;
 		return;
+	}
+	
+	public void addTimeTable(){
+		getTimeTableArray().add(new TimeTable());
 	}
 }
 

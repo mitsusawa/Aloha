@@ -1,22 +1,21 @@
 package com.product.aloha.Data;
 
-import javax.persistence.*;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
+import javax.persistence.JoinColumn;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-@Entity
-@Table(name = "data_time_table")
-public class TimeTable{
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column
-	@NotNull
-	private Long id;
-	public Long getId() {
-		return id;
+@Embeddable
+public class TimeTable {
+	
+	public void setDividedNum(Byte dividedNum) {
+		this.dividedNum = dividedNum;
 	}
 	
 	public byte getDividedNum() {
@@ -35,25 +34,35 @@ public class TimeTable{
 		TableName = tableName;
 	}
 	
-	@Column(nullable = true)
+	public TimeTable() {
+		if(Objects.isNull(getLessonArray())){
+			new ArrayList<Lesson>();
+		}
+	}
+	
 	private Byte dividedNum;
 	
-	public List<Lesson[]> getTable() {
-		return table;
-		
-	}
-	
-	public void setTable(List<Lesson[]> table) {
-		this.table = table;
-	}
-	
-	@Column(nullable = true)
 	@Size(min = 1, max = 128)
 	private String TableName;
 	
-	@OneToMany(targetEntity = Lesson.class)
-	private List<Lesson[]> table;
+	public List<List<Lesson>> getLessonArray() {
+		return lessonArray;
+	}
 	
-	@ManyToOne(targetEntity = Data.class)
-	private Data data;
+	public void setLessonArray(List<List<Lesson>> lessonArray) {
+		this.lessonArray = lessonArray;
+	}
+	
+	@Embedded
+	@CollectionTable(joinColumns = @JoinColumn(name = "data_time_table_lesson_array_id", nullable = true))
+	@Column(nullable = true)
+	private List<List<Lesson>> lessonArray;
+	
+	public void addLessonArray() {
+		int size = getLessonArray().size();
+		getLessonArray().add(new ArrayList<>());
+		for (Lesson lesson: getLessonArray().get(size)) {
+			lesson = new Lesson();
+		}
+	}
 }

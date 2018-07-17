@@ -2,10 +2,7 @@ package com.product.aloha;
 
 import com.product.aloha.Data.Data;
 import com.product.aloha.Data.Lesson;
-import com.product.aloha.Data.TimeTable;
 import com.product.aloha.repositories.DataRepository;
-import com.product.aloha.repositories.LessonRepository;
-import com.product.aloha.repositories.TimeTableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,8 +21,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.HtmlUtils;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,12 +35,6 @@ public class AlohaApplication {
 	LoginUserSession loginUserSession;
 	
 	final DataRepository repository;
-	
-	@Autowired
-	private TimeTableRepository timeTableRepository;
-	
-	@Autowired
-	private LessonRepository lessonRepository;
 	
 	@Autowired
 	PasswordEncoder passwordEncoder;
@@ -169,12 +161,12 @@ public class AlohaApplication {
 	@RequestMapping(value = {"/table"}, method = RequestMethod.GET)
 	public String table(Model model, @RequestParam("requirednum") int requirdNum) {
 		if (loginUserSession.isLoggedIn()) {
-			if(Objects.isNull(loginUserSession.getData())) {
+			if (Objects.isNull(loginUserSession.getData())) {
 				loginUserSession.setData(repository.findOneByUserName(loginUserSession.getLoggedInName(), Data.class));
 			}
 			Data data = loginUserSession.getData();
 			try {
-				model.addAttribute("table", data.getTimeTableArray().get(requirdNum).getTable());
+				model.addAttribute("getTable", data.getTimeTableArray().get(requirdNum).getLessonArray());
 				model.addAttribute("tableName", data.getTimeTableArray().get(requirdNum).getTableName());
 			} catch (Exception e) {
 				return "redirect:/index";
@@ -186,7 +178,7 @@ public class AlohaApplication {
 	}
 	
 	@RequestMapping(value = {"/makeup"}, method = RequestMethod.POST)
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
 	public String makeUpExec(Model model, @ModelAttribute("makeUpForm") @Validated MakeUpForm makeUpForm, BindingResult result) {
 		if (loginUserSession.isLoggedIn()) {
 			String safeMakeUpTableName = HtmlUtils.htmlEscape(makeUpForm.getMakeUpTableName());
@@ -194,15 +186,21 @@ public class AlohaApplication {
 			Data data = loginUserSession.getData();
 			int tableNum;
 			if (Objects.isNull(data.getTimeTableArray())) {
-				data.setTimeTableArray(new ArrayList<TimeTable>());
+				data.setTimeTableArray(new ArrayList<>(0));
 			}
 			tableNum = data.getTimeTableArray().size();
-			data.getTimeTableArray().add(new TimeTable());
-			data.getTimeTableArray().get(tableNum).setDividedNum(makeUpForm.getDivideNum());
+			data.addTimeTable();
+			data.getTimeTableArray().get(tableNum).setDividedNum(Byte.parseByte(makeUpForm.getDivideNum()));
 			data.getTimeTableArray().get(tableNum).setTableName(safeMakeUpTableName);
-			data.getTimeTableArray().get(tableNum).setTable(new ArrayList<>(data.getTimeTableArray().get(tableNum).getDividedNum()));
-			Collections.fill(data.getTimeTableArray().get(tableNum).getTable(), new Lesson[7]);
-			timeTableRepository.save(data.getTimeTableArray().get(tableNum));
+			data.getTimeTableArray().get(tableNum).setLessonArray(new ArrayList<List<Lesson>>());
+			for (int i = 0; i < data.getTimeTableArray().get(tableNum).getDividedNum(); i++) {
+				data.getTimeTableArray().get(tableNum).addLessonArray();
+			}
+			for (int i = 0; i < data.getTimeTableArray().get(tableNum).getLessonArray().size(); i++) {
+				for (int j = 0; j < 7; j++) {
+					data.getTimeTableArray().get(tableNum).addLessonArray();
+				}
+			}
 			repository.saveAndFlush(data);
 			return "redirect:/table?requirednum=" + tableNum;
 		} else {

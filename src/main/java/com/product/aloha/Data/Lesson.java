@@ -6,29 +6,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
 
-@Entity
-public class Lesson{
-	public Long getId() {
-		return id;
-	}
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column
-	@NotNull
-	private Long id;
-	
-	@Column(nullable = true)
+@Embeddable
+public class Lesson {
 	private String name;
-	@Column(nullable = true)
+	
 	private Duration startTime;
-	@Column(nullable = true)
 	private Duration endTime;
 	
 	public String getName() {
@@ -55,10 +42,11 @@ public class Lesson{
 		this.endTime = endTime;
 	}
 	
-	public Lesson(){
-		name = "";
+	public Lesson newLesson(){
+		return new Lesson();
 	}
 	
-	@ManyToOne(targetEntity = TimeTable.class)
-	private TimeTable timeTable;
+	public Lesson() {
+		name = "未入力";
+	}
 }

@@ -107,7 +107,7 @@
 				</div>
 
 				<div class="bs-component">
-					<table class="table table-hover">
+					<lessonArray class="lessonArray lessonArray-hover">
 						<thead>
 						<tr>
 							<th scope="col"><font color="red">日</font></th>
@@ -118,19 +118,17 @@
 							<th scope="col">金</th>
 							<th scope="col"><font color="blue">土</font></th>
 						</tr>
-						</tbody>
-						<c:forEach items="${table}" var="list">
-							<thead>
+						</thead>
+						<tbody>
+						<c:forEach items="${getTable}" var="list">
 							<tr>
-							<c:forEach items="${list.table}" var="item">
-								<th scope="col"><c:out value="${item}" /></th>
+							<c:forEach items="${list}" var="lessonArray">
+								<th scope="col"><c:out value="${lessonArray.name}" /></th>
 							</c:forEach>
 							</tr>
-							</tbody>
 						</c:forEach>
-
-
-					</table>
+						</tbody>
+					</lessonArray>
 				</div><!-- /example -->
 			</div>
 		</div>

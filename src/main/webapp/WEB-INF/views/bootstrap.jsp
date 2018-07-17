@@ -503,7 +503,7 @@
 				</div>
 
 				<div class="bs-component">
-					<table class="table table-hover">
+					<lessonArray class="lessonArray lessonArray-hover">
 						<thead>
 						<tr>
 							<th scope="col">Type</th>
@@ -513,7 +513,7 @@
 						</tr>
 						</thead>
 						<tbody>
-						<tr class="table-active">
+						<tr class="lessonArray-active">
 							<th scope="row">Active</th>
 							<td>高坂穂乃果</td>
 							<td>8月3日(獅子座)</td>
@@ -525,56 +525,56 @@
 							<td>6月9日(双子座)</td>
 							<td>O型</td>
 						</tr>
-						<tr class="table-primary">
+						<tr class="lessonArray-primary">
 							<th scope="row">Primary</th>
 							<td>園田海未</td>
 							<td>3月15日(魚座)</td>
 							<td>A型</td>
 						</tr>
-						<tr class="table-secondary">
+						<tr class="lessonArray-secondary">
 							<th scope="row">Secondary</th>
 							<td>南ことり</td>
 							<td>9月12日(乙女座)</td>
 							<td>O型</td>
 						</tr>
-						<tr class="table-success">
+						<tr class="lessonArray-success">
 							<th scope="row">Success</th>
 							<td>小泉花陽</td>
 							<td>1月17日(山羊座)</td>
 							<td>B型</td>
 						</tr>
-						<tr class="table-danger">
+						<tr class="lessonArray-danger">
 							<th scope="row">Danger</th>
 							<td>西木野真姫</td>
 							<td>4月19日(牡羊座)</td>
 							<td>AB型</td>
 						</tr>
-						<tr class="table-warning">
+						<tr class="lessonArray-warning">
 							<th scope="row">Warning</th>
 							<td>星空凛</td>
 							<td>11月1日(蠍座)</td>
 							<td>A型</td>
 						</tr>
-						<tr class="table-info">
+						<tr class="lessonArray-info">
 							<th scope="row">Info</th>
 							<td>絢瀬絵里</td>
 							<td>10月21日(天秤座)</td>
 							<td>B型</td>
 						</tr>
-						<tr class="table-light">
+						<tr class="lessonArray-light">
 							<th scope="row">Light</th>
 							<td>矢澤にこ</td>
 							<td>7月22日(蟹座)</td>
 							<td>A型</td>
 						</tr>
-						<tr class="table-dark">
+						<tr class="lessonArray-dark">
 							<th scope="row">Dark</th>
 							<td>アルパカ</td>
 							<td>?月?日(？座)</td>
 							<td>?型</td>
 						</tr>
 						</tbody>
-					</table>
+					</lessonArray>
 				</div><!-- /example -->
 			</div>
 		</div>

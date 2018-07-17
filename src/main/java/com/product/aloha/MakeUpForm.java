@@ -8,11 +8,11 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 public class MakeUpForm {
-	public byte getDivideNum() {
+	public String getDivideNum() {
 		return divideNum;
 	}
 	
-	public void setDivideNum(byte divideNum) {
+	public void setDivideNum(String divideNum) {
 		this.divideNum = divideNum;
 	}
 	
@@ -24,9 +24,8 @@ public class MakeUpForm {
 		this.makeUpTableName = makeUpTableName;
 	}
 	
-	@Min(1)
-	@Max(127)
-	private byte divideNum;
+	@NotEmpty
+	private String divideNum;
 	
 	@NotEmpty
 	@Size(min = 1, max = 128)
