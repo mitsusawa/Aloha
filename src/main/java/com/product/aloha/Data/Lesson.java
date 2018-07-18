@@ -2,20 +2,16 @@ package com.product.aloha.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import java.time.Duration;
 
 @Embeddable
 public class Lesson {
+	@Column(nullable = true)
 	private String name;
 	
+	@Column(nullable = true)
 	private Duration startTime;
+	@Column(nullable = true)
 	private Duration endTime;
 	
 	public String getName() {
@@ -40,10 +36,6 @@ public class Lesson {
 	
 	public void setEndTime(Duration endTime) {
 		this.endTime = endTime;
-	}
-	
-	public Lesson newLesson(){
-		return new Lesson();
 	}
 	
 	public Lesson() {

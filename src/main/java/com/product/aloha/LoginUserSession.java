@@ -1,6 +1,8 @@
 package com.product.aloha;
 
 import com.product.aloha.Data.Data;
+import com.product.aloha.Data.LessonArrayWrap;
+import com.product.aloha.Data.TimeTable;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
@@ -18,6 +20,10 @@ public class LoginUserSession {
 	}
 	
 	public Data data;
+	
+	public LessonArrayWrap lessonArrayWrap;
+	
+	public TimeTable timeTable;
 	
 	public boolean isLoggedIn() {
 		return loggedIn;

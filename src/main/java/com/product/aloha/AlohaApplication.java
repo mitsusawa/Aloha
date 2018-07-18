@@ -2,7 +2,10 @@ package com.product.aloha;
 
 import com.product.aloha.Data.Data;
 import com.product.aloha.Data.Lesson;
+import com.product.aloha.Data.LessonArrayWrap;
 import com.product.aloha.repositories.DataRepository;
+import com.product.aloha.repositories.LessonArrayWrapRepository;
+import com.product.aloha.repositories.TimeTableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.HtmlUtils;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -34,14 +36,20 @@ public class AlohaApplication {
 	@Autowired
 	LoginUserSession loginUserSession;
 	
-	final DataRepository repository;
+	private final DataRepository repository;
+	
+	private final TimeTableRepository timeTableRepository;
+	
+	private final LessonArrayWrapRepository lessonArrayWrapRepository;
 	
 	@Autowired
 	PasswordEncoder passwordEncoder;
 	
 	@Autowired
-	public AlohaApplication(DataRepository repository) {
+	public AlohaApplication(DataRepository repository, TimeTableRepository timeTableRepository, LessonArrayWrapRepository lessonArrayWrapRepository) {
 		this.repository = repository;
+		this.timeTableRepository = timeTableRepository;
+		this.lessonArrayWrapRepository = lessonArrayWrapRepository;
 	}
 	
 	@Bean
@@ -166,7 +174,7 @@ public class AlohaApplication {
 			}
 			Data data = loginUserSession.getData();
 			try {
-				model.addAttribute("getTable", data.getTimeTableArray().get(requirdNum).getLessonArray());
+				model.addAttribute("getTable", data.getTimeTableArray().get(requirdNum).getLessonArrayWrap());
 				model.addAttribute("tableName", data.getTimeTableArray().get(requirdNum).getTableName());
 			} catch (Exception e) {
 				return "redirect:/index";
@@ -190,17 +198,24 @@ public class AlohaApplication {
 			}
 			tableNum = data.getTimeTableArray().size();
 			data.addTimeTable();
-			data.getTimeTableArray().get(tableNum).setDividedNum(Byte.parseByte(makeUpForm.getDivideNum()));
 			data.getTimeTableArray().get(tableNum).setTableName(safeMakeUpTableName);
-			data.getTimeTableArray().get(tableNum).setLessonArray(new ArrayList<List<Lesson>>());
-			for (int i = 0; i < data.getTimeTableArray().get(tableNum).getDividedNum(); i++) {
-				data.getTimeTableArray().get(tableNum).addLessonArray();
+			if (Objects.isNull(data.getTimeTableArray().get(tableNum).getLessonArrayWrap())) {
+				data.getTimeTableArray().get(tableNum).setLessonArrayWrap(new ArrayList<LessonArrayWrap>());
 			}
-			for (int i = 0; i < data.getTimeTableArray().get(tableNum).getLessonArray().size(); i++) {
-				for (int j = 0; j < 7; j++) {
-					data.getTimeTableArray().get(tableNum).addLessonArray();
+			for (int i = 0; i < 7; i++) {
+				data.getTimeTableArray().get(tableNum).getLessonArrayWrap().add(new LessonArrayWrap());
+			}
+			int tmpNum = Integer.parseInt(HtmlUtils.htmlEscape(makeUpForm.getDivideNum()));
+			for (LessonArrayWrap lnwpArray : data.getTimeTableArray().get(tableNum).getLessonArrayWrap()) {
+				if(Objects.isNull(lnwpArray.getArray())){
+					lnwpArray.setArray(new ArrayList<>());
+				}
+				lessonArrayWrapRepository.save(lnwpArray);
+				for (int i = 0; i < tmpNum; i++) {
+					lnwpArray.getArray().add(new Lesson());
 				}
 			}
+			timeTableRepository.save(data.getTimeTableArray().get(tableNum));
 			repository.saveAndFlush(data);
 			return "redirect:/table?requirednum=" + tableNum;
 		} else {

@@ -48,10 +48,7 @@ public class Data {
 		}
 	}
 	
-	@ElementCollection(targetClass = TimeTable.class)
-	@CollectionTable(name="data_time_table_array",joinColumns = @JoinColumn(name = "data_time_table_id", nullable = true))
-	@Column(name="data_time_table")
-	@Embedded
+	@OneToMany(targetEntity = TimeTable.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<TimeTable> timeTableArray;
 	
 	public String getUserName() {

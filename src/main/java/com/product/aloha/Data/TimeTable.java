@@ -1,17 +1,13 @@
 package com.product.aloha.Data;
 
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
-import javax.persistence.JoinColumn;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@Embeddable
+@Entity
 public class TimeTable {
 	
 	public void setDividedNum(Byte dividedNum) {
@@ -26,6 +22,14 @@ public class TimeTable {
 		this.dividedNum = dividedNum;
 	}
 	
+	public TimeTable(List<List<Lesson>> lessonArray) {
+		if (Objects.isNull(getLessonArrayWrap())) {
+			setLessonArrayWrap(new ArrayList<LessonArrayWrap>() {
+			});
+			
+		}
+	}
+	
 	public String getTableName() {
 		return TableName;
 	}
@@ -35,34 +39,64 @@ public class TimeTable {
 	}
 	
 	public TimeTable() {
-		if(Objects.isNull(getLessonArray())){
-			new ArrayList<Lesson>();
-		}
 	}
+	
+	public Long getId() {
+		return id;
+	}
+	
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(nullable = false, unique = true)
+	@NotNull
+	private Long id;
 	
 	private Byte dividedNum;
 	
 	@Size(min = 1, max = 128)
 	private String TableName;
 	
-	public List<List<Lesson>> getLessonArray() {
+	
+	public List<LessonArrayWrap> getLessonArrayWrap() {
 		return lessonArray;
 	}
 	
-	public void setLessonArray(List<List<Lesson>> lessonArray) {
+	public void setLessonArrayWrap(List<LessonArrayWrap> lessonArray) {
 		this.lessonArray = lessonArray;
 	}
 	
-	@Embedded
-	@CollectionTable(joinColumns = @JoinColumn(name = "data_time_table_lesson_array_id", nullable = true))
-	@Column(nullable = true)
-	private List<List<Lesson>> lessonArray;
+	public Data getData() {
+		return data;
+	}
 	
-	public void addLessonArray() {
-		int size = getLessonArray().size();
-		getLessonArray().add(new ArrayList<>());
-		for (Lesson lesson: getLessonArray().get(size)) {
-			lesson = new Lesson();
+	public void setData(Data data) {
+		this.data = data;
+	}
+	
+	@OneToMany(targetEntity = LessonArrayWrap.class, cascade = CascadeType.ALL)
+	private List<LessonArrayWrap> lessonArray;
+	
+	public void addLessonArrayWrap() {
+		if (Objects.isNull(getLessonArrayWrap())) {
+			setLessonArrayWrap(new ArrayList<LessonArrayWrap>());
+		}
+		for (LessonArrayWrap lnList : getLessonArrayWrap()) {
+			if (Objects.isNull(lnList)) {
+				lnList = new LessonArrayWrap();
+			}
+			for (Lesson ln : lnList.getArray()) {
+				if (Objects.isNull(ln)) {
+					ln = new Lesson();
+				}
+			}
 		}
 	}
+	
+	@ManyToOne(targetEntity = Data.class)
+	Data data;
+	
 }
