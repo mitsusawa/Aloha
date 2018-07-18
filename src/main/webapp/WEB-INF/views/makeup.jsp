@@ -116,7 +116,7 @@
 						</div>
 						<div class="form-group">
 							<label for="divideNum">時限数</label>
-							<select class="form-control" id="divideNum">
+							<select class="form-control" id="divideNum" name="divideNum" required="">
 								<c:forEach begin="1" end="16" step="1" varStatus="loop">
 									<option>${loop.index}</option>
 								</c:forEach>

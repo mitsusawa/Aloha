@@ -25,12 +25,6 @@
 				position: relative;
 			}
 
-			.bs-docs-section .page-header h1 {
-				padding: .5rem 0;
-				margin-bottom: 2rem;
-				border-bottom: 1px solid #eee;
-			}
-
 			.bs-component .modal {
 				position: relative;
 				top: auto;
@@ -99,39 +93,50 @@
 
 <div class="container">
 	<section class="bs-docs-section">
-
 		<div class="row">
 			<div class="col-lg-12">
 				<div class="page-header">
-					<h1 id="tables"><c:out value="${tableName}" /></h1>
+					<h1 id="tables"><c:out value="${tableName}"/></h1>
 				</div>
 
 				<div class="bs-component">
-					<table class="table table-hover">
+					<table class="lessonArray lessonArray-hover">
 						<thead>
 						<tr>
-							<th scope="col"><font color="red">日</font></th>
-							<th scope="col">月</th>
-							<th scope="col">火</th>
-							<th scope="col">水</th>
-							<th scope="col">木</th>
-							<th scope="col">金</th>
-							<th scope="col"><font color="blue">土</font></th>
+							<div style="text-align: center;">
+								<th scope="col"><span style="color: red; ">日</span></th>
+							</div>
+							<div style="text-align: center;">
+								<th scope="col">月</th>
+							</div>
+							<div style="text-align: center;">
+								<th scope="col">火</th>
+							</div>
+							<div style="text-align: center;">
+								<th scope="col">水</th>
+							</div>
+							<div style="text-align: center;">
+								<th scope="col">木</th>
+							</div>
+							<div style="text-align: center;">
+								<th scope="col">金</th>
+							</div>
+							<div style="text-align: center;">
+								<th scope="col"><span style="color: blue; ">土</span></th>
+							</div>
 						</tr>
-						</tbody>
-						<c:forEach items="${table}" var="list">
-							<thead>
+						</thead>
+						<tbody>
+						<c:forEach items="${getTable}" var="list">
 							<tr>
-							<c:forEach items="${list.table}" var="item">
-								<th scope="col"><c:out value="${item}" /></th>
-							</c:forEach>
+								<c:forEach items="${list.array}" var="lessonArray">
+									<td><c:out value="${lessonArray.name}"/></td>
+								</c:forEach>
 							</tr>
-							</tbody>
 						</c:forEach>
-
-
+						</tbody>
 					</table>
-				</div><!-- /example -->
+				</div>
 			</div>
 		</div>
 	</section>
@@ -143,6 +148,11 @@
         integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
         crossorigin="anonymous"></script>
 <script src="./js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+    $('.bs-component [data-toggle="popover"]').popover();
+    $('.bs-component [data-toggle="tooltip"]').tooltip();
+</script>
 
 </body>
 </html>

@@ -2,9 +2,9 @@ package com.product.aloha;
 
 import com.product.aloha.Data.Data;
 import com.product.aloha.Data.Lesson;
-import com.product.aloha.Data.TimeTable;
+import com.product.aloha.Data.LessonArrayWrap;
 import com.product.aloha.repositories.DataRepository;
-import com.product.aloha.repositories.LessonRepository;
+import com.product.aloha.repositories.LessonArrayWrapRepository;
 import com.product.aloha.repositories.TimeTableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -24,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.HtmlUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,20 +36,20 @@ public class AlohaApplication {
 	@Autowired
 	LoginUserSession loginUserSession;
 	
-	final DataRepository repository;
+	private final DataRepository repository;
 	
-	@Autowired
-	private TimeTableRepository timeTableRepository;
+	private final TimeTableRepository timeTableRepository;
 	
-	@Autowired
-	private LessonRepository lessonRepository;
+	private final LessonArrayWrapRepository lessonArrayWrapRepository;
 	
 	@Autowired
 	PasswordEncoder passwordEncoder;
 	
 	@Autowired
-	public AlohaApplication(DataRepository repository) {
+	public AlohaApplication(DataRepository repository, TimeTableRepository timeTableRepository, LessonArrayWrapRepository lessonArrayWrapRepository) {
 		this.repository = repository;
+		this.timeTableRepository = timeTableRepository;
+		this.lessonArrayWrapRepository = lessonArrayWrapRepository;
 	}
 	
 	@Bean
@@ -169,12 +169,12 @@ public class AlohaApplication {
 	@RequestMapping(value = {"/table"}, method = RequestMethod.GET)
 	public String table(Model model, @RequestParam("requirednum") int requirdNum) {
 		if (loginUserSession.isLoggedIn()) {
-			if(Objects.isNull(loginUserSession.getData())) {
+			if (Objects.isNull(loginUserSession.getData())) {
 				loginUserSession.setData(repository.findOneByUserName(loginUserSession.getLoggedInName(), Data.class));
 			}
 			Data data = loginUserSession.getData();
 			try {
-				model.addAttribute("table", data.getTimeTableArray().get(requirdNum).getTable());
+				model.addAttribute("getTable", data.getTimeTableArray().get(requirdNum).getLessonArrayWrap());
 				model.addAttribute("tableName", data.getTimeTableArray().get(requirdNum).getTableName());
 			} catch (Exception e) {
 				return "redirect:/index";
@@ -186,7 +186,7 @@ public class AlohaApplication {
 	}
 	
 	@RequestMapping(value = {"/makeup"}, method = RequestMethod.POST)
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
 	public String makeUpExec(Model model, @ModelAttribute("makeUpForm") @Validated MakeUpForm makeUpForm, BindingResult result) {
 		if (loginUserSession.isLoggedIn()) {
 			String safeMakeUpTableName = HtmlUtils.htmlEscape(makeUpForm.getMakeUpTableName());
@@ -194,14 +194,27 @@ public class AlohaApplication {
 			Data data = loginUserSession.getData();
 			int tableNum;
 			if (Objects.isNull(data.getTimeTableArray())) {
-				data.setTimeTableArray(new ArrayList<TimeTable>());
+				data.setTimeTableArray(new ArrayList<>(0));
 			}
 			tableNum = data.getTimeTableArray().size();
-			data.getTimeTableArray().add(new TimeTable());
-			data.getTimeTableArray().get(tableNum).setDividedNum(makeUpForm.getDivideNum());
+			data.addTimeTable();
 			data.getTimeTableArray().get(tableNum).setTableName(safeMakeUpTableName);
-			data.getTimeTableArray().get(tableNum).setTable(new ArrayList<>(data.getTimeTableArray().get(tableNum).getDividedNum()));
-			Collections.fill(data.getTimeTableArray().get(tableNum).getTable(), new Lesson[7]);
+			if (Objects.isNull(data.getTimeTableArray().get(tableNum).getLessonArrayWrap())) {
+				data.getTimeTableArray().get(tableNum).setLessonArrayWrap(new ArrayList<LessonArrayWrap>());
+			}
+			for (int i = 0; i < 7; i++) {
+				data.getTimeTableArray().get(tableNum).getLessonArrayWrap().add(new LessonArrayWrap());
+			}
+			int tmpNum = Integer.parseInt(HtmlUtils.htmlEscape(makeUpForm.getDivideNum()));
+			for (LessonArrayWrap lnwpArray : data.getTimeTableArray().get(tableNum).getLessonArrayWrap()) {
+				if(Objects.isNull(lnwpArray.getArray())){
+					lnwpArray.setArray(new ArrayList<>());
+				}
+				lessonArrayWrapRepository.save(lnwpArray);
+				for (int i = 0; i < tmpNum; i++) {
+					lnwpArray.getArray().add(new Lesson());
+				}
+			}
 			timeTableRepository.save(data.getTimeTableArray().get(tableNum));
 			repository.saveAndFlush(data);
 			return "redirect:/table?requirednum=" + tableNum;
