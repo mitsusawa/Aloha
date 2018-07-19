@@ -21,10 +21,6 @@ public class LoginUserSession {
 	
 	public Data data;
 	
-	public LessonArrayWrap lessonArrayWrap;
-	
-	public TimeTable timeTable;
-	
 	public boolean isLoggedIn() {
 		return loggedIn;
 	}
