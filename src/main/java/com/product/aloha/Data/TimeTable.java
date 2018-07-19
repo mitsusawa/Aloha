@@ -1,6 +1,14 @@
 package com.product.aloha.Data;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
@@ -24,18 +32,16 @@ public class TimeTable {
 	
 	public TimeTable(List<List<Lesson>> lessonArray) {
 		if (Objects.isNull(getLessonArrayWrap())) {
-			setLessonArrayWrap(new ArrayList<LessonArrayWrap>() {
-			});
-			
+			addLessonArrayWrap();
 		}
 	}
 	
 	public String getTableName() {
-		return TableName;
+		return tableName;
 	}
 	
 	public void setTableName(String tableName) {
-		TableName = tableName;
+		this.tableName = tableName;
 	}
 	
 	public TimeTable() {
@@ -58,7 +64,7 @@ public class TimeTable {
 	private Byte dividedNum;
 	
 	@Size(min = 1, max = 128)
-	private String TableName;
+	private String tableName;
 	
 	
 	public List<LessonArrayWrap> getLessonArrayWrap() {

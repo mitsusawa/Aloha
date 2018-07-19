@@ -48,7 +48,7 @@ public class Data {
 		}
 	}
 	
-	@OneToMany(targetEntity = TimeTable.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(targetEntity = TimeTable.class, cascade = CascadeType.ALL)
 	private List<TimeTable> timeTableArray;
 	
 	public String getUserName() {
