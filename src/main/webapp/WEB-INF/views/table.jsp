@@ -99,25 +99,23 @@
 		<div class="row">
 			<div class="col-lg-12">
 				<div class="bs-component">
-					<table class="table table-hover">
+					<table class="table table-hover" style="text-align: center;">
 						<thead>
 						<tr>
-							<div style="text-align: center;">
-								<th scope="col"><span style="color: red; text-align: center;">日</span></th>
-								<th scope="col"><span style="text-align: center;">月</span></th>
-								<th scope="col"><span style="text-align: center;">火</span></th>
-								<th scope="col"><span style="text-align: center;">水</span></th>
-								<th scope="col"><span style="text-align: center;">木</span></th>
-								<th scope="col"><span style="text-align: center;">金</span></th>
-								<th scope="col"><span style="color: blue; text-align: center;">土</span></th>
-							</div>
+							<th scope="col" class="table-active"><span style="color: red; text-align: center;">日</span></th>
+							<th scope="col" class="table-primary"><span style="text-align: center;">月</span></th>
+							<th scope="col" class="table-success"><span style="text-align: center;">火</span></th>
+							<th scope="col" class="table-primary"><span style="text-align: center;">水</span></th>
+							<th scope="col" class="table-success"><span style="text-align: center;">木</span></th>
+							<th scope="col" class="table-primary"><span style="text-align: center;">金</span></th>
+							<th scope="col" class="table-active"><span style="color: blue; text-align: center;">土</span></th>
 						</tr>
 						</thead>
 						<tbody>
 						<c:forEach items="${getTable}" var="list" begin="0" step="1" varStatus="i">
 							<tr>
 								<c:forEach items="${list.array}" var="lessonArray" begin="0" step="1" varStatus="j">
-									<td>
+									<td  class="<c:choose><c:when test="${(j.index % 2 == 0 && i.index % 2 == 0) || (j.index % 2 == 1 && i.index % 2 == 1)}">table-light</c:when><c:otherwise>table-secondary</c:otherwise></c:choose>">
 										<form:form method="get" action="/edit">
 											<fieldset id="editPage_field">
 												<div class="form-group">

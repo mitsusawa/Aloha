@@ -5,6 +5,7 @@ import com.product.aloha.Data.Lesson;
 import com.product.aloha.Data.LessonArrayWrap;
 import com.product.aloha.repositories.DataRepository;
 import com.product.aloha.repositories.LessonArrayWrapRepository;
+import com.product.aloha.repositories.LessonRepository;
 import com.product.aloha.repositories.TimeTableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -43,14 +44,17 @@ public class AlohaApplication {
 	
 	private final LessonArrayWrapRepository lessonArrayWrapRepository;
 	
+	private final LessonRepository lessonRepository;
+	
 	@Autowired
 	PasswordEncoder passwordEncoder;
 	
 	@Autowired
-	public AlohaApplication(DataRepository repository, TimeTableRepository timeTableRepository, LessonArrayWrapRepository lessonArrayWrapRepository) {
+	public AlohaApplication(DataRepository repository, TimeTableRepository timeTableRepository, LessonArrayWrapRepository lessonArrayWrapRepository, LessonRepository lessonRepository) {
 		this.repository = repository;
 		this.timeTableRepository = timeTableRepository;
 		this.lessonArrayWrapRepository = lessonArrayWrapRepository;
+		this.lessonRepository = lessonRepository;
 	}
 	
 	@Bean
@@ -224,6 +228,7 @@ public class AlohaApplication {
 				lessonArrayWrapRepository.save(lnwpArray);
 				for (int i = 0; i < 7; i++) {
 					lnwpArray.getArray().add(new Lesson());
+					lessonRepository.save(lnwpArray.getArray().get(i));
 				}
 			}
 			timeTableRepository.save(data.getTimeTableArray().get(tableNum));
@@ -261,6 +266,7 @@ public class AlohaApplication {
 			int editLessonNum = Integer.parseInt(HtmlUtils.htmlEscape(editForm.getEditLessonNum()));
 			int tableNum = Integer.parseInt(HtmlUtils.htmlEscape(editForm.getTableNum()));
 			data.getTimeTableArray().get(tableNum).getLessonArrayWrap().get(wrapNum).getArray().get(editLessonNum).setName(safeEditLessonName);
+			lessonRepository.save(data.getTimeTableArray().get(tableNum).getLessonArrayWrap().get(wrapNum).getArray().get(editLessonNum));
 			lessonArrayWrapRepository.save(data.getTimeTableArray().get(tableNum).getLessonArrayWrap().get(wrapNum));
 			timeTableRepository.save(data.getTimeTableArray().get(tableNum));
 			repository.saveAndFlush(data);
