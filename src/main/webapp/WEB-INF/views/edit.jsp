@@ -105,7 +105,7 @@
 		<div class="col-md-3 col-lg-3"></div>
 		<div class="col-md-6 col-lg-6">
 			<div class="well well-sm">
-				<form:form modelAttribute="editForm" method="post" action="/edit">
+				<form:form modelAttribute="editForm" method="post" action="./edit">
 					<fieldset id="edit_field">
 						<input type="hidden" class="form-control" id="tableNum" name="tableNum" value="${tableNum}"/>
 						<input type="hidden" class="form-control" id="wrapNum" name="wrapNum" value="${wrapNum}"/>

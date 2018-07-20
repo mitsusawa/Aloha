@@ -106,7 +106,7 @@
 		<div class="col-md-3 col-lg-3"></div>
 		<div class="col-md-6 col-lg-6">
 			<div class="well well-sm">
-				<form:form modelAttribute="loginForm" method="post" action="/login">
+				<form:form modelAttribute="loginForm" method="post" action="./login">
 					<fieldset id="login_field">
 						<div class="form-group">
 							<label>ユーザID</label>

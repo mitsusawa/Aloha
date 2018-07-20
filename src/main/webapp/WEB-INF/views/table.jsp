@@ -102,6 +102,7 @@
 					<table class="table table-hover" style="text-align: center;">
 						<thead>
 						<tr>
+							<th scope="col" class="table-bordered"><span style="text-align: center;"></span></th>
 							<th scope="col" class="table-active"><span style="color: red; text-align: center;">日</span></th>
 							<th scope="col" class="table-primary"><span style="text-align: center;">月</span></th>
 							<th scope="col" class="table-success"><span style="text-align: center;">火</span></th>
@@ -114,9 +115,12 @@
 						<tbody>
 						<c:forEach items="${getTable}" var="list" begin="0" step="1" varStatus="i">
 							<tr>
+								<div class="form-group">
+									<th scope="col" class="table-bordered"><span style="text-align: center;">${i.index + 1}</span></th>
+								</div>
 								<c:forEach items="${list.array}" var="lessonArray" begin="0" step="1" varStatus="j">
 									<td  class="<c:choose><c:when test="${(j.index % 2 == 0 && i.index % 2 == 0) || (j.index % 2 == 1 && i.index % 2 == 1)}">table-light</c:when><c:otherwise>table-secondary</c:otherwise></c:choose>">
-										<form:form method="get" action="/edit">
+										<form:form method="get" action="./edit">
 											<fieldset id="editPage_field">
 												<div class="form-group">
 													<input type="hidden" class="form-control" id="tableNum"

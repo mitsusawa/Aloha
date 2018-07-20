@@ -7,6 +7,7 @@ import com.product.aloha.repositories.DataRepository;
 import com.product.aloha.repositories.LessonArrayWrapRepository;
 import com.product.aloha.repositories.LessonRepository;
 import com.product.aloha.repositories.TimeTableRepository;
+import com.product.aloha.repositories.ToDoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -46,15 +47,18 @@ public class AlohaApplication {
 	
 	private final LessonRepository lessonRepository;
 	
+	private final ToDoRepository toDoRepository;
+	
 	@Autowired
 	PasswordEncoder passwordEncoder;
 	
 	@Autowired
-	public AlohaApplication(DataRepository repository, TimeTableRepository timeTableRepository, LessonArrayWrapRepository lessonArrayWrapRepository, LessonRepository lessonRepository) {
+	public AlohaApplication(DataRepository repository, TimeTableRepository timeTableRepository, LessonArrayWrapRepository lessonArrayWrapRepository, LessonRepository lessonRepository, ToDoRepository toDoRepository) {
 		this.repository = repository;
 		this.timeTableRepository = timeTableRepository;
 		this.lessonArrayWrapRepository = lessonArrayWrapRepository;
 		this.lessonRepository = lessonRepository;
+		this.toDoRepository = toDoRepository;
 	}
 	
 	@Bean

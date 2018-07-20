@@ -107,7 +107,7 @@
 		<div class="col-md-3 col-lg-3"></div>
 		<div class="col-md-6 col-lg-6">
 			<div class="well well-sm">
-				<form:form modelAttribute="makeUpForm" method="post" action="/makeup">
+				<form:form modelAttribute="makeUpForm" method="post" action="./makeup">
 					<fieldset id="makeup_field">
 						<div class="form-group">
 							<label>タイトル</label>

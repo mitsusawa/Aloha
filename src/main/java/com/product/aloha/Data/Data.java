@@ -27,8 +27,10 @@ public class Data {
 	
 	@Column(length = 512, nullable = true)
 	@NotEmpty
-	
 	private String password;
+	
+	@OneToMany(targetEntity = ToDo.class)
+	private List<ToDo> toDoList;
 	
 	public List<TimeTable> getTimeTableArray() {
 		return timeTableArray;
@@ -46,6 +48,9 @@ public class Data {
 		if (Objects.isNull(getTimeTableArray())){
 			setTimeTableArray(new ArrayList<TimeTable>());
 		}
+		if (Objects.isNull(getToDoList())){
+			setToDoList(new ArrayList<>());
+		}
 	}
 	
 	@OneToMany(targetEntity = TimeTable.class, cascade = CascadeType.ALL)
@@ -53,6 +58,18 @@ public class Data {
 	
 	public String getUserName() {
 		return userName;
+	}
+	
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
+	public List<ToDo> getToDoList() {
+		return toDoList;
+	}
+	
+	public void setToDoList(List<ToDo> toDoList) {
+		this.toDoList = toDoList;
 	}
 	
 	public String getPassword() {
