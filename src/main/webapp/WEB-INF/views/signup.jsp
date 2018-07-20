@@ -106,7 +106,7 @@
 		<div class="col-md-3 col-lg-3"></div>
 		<div class="col-md-6 col-lg-6">
 			<div class="well well-sm">
-				<form:form modelAttribute="signUpForm" method="post" action="/signup">
+				<form:form modelAttribute="signUpForm" method="post" action="./signup">
 					<fieldset id="signUp_field">
 						<div class="form-group">
 							<label>ユーザID</label>
