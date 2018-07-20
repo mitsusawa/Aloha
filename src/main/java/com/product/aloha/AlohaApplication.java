@@ -72,6 +72,7 @@ public class AlohaApplication {
 	
 	@RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
 	public String index(Model model) {
+		model.addAttribute("isLoggedIn", loginUserSession.isLoggedIn());
 		if (!loginUserSession.isLoggedIn()) {
 			model.addAttribute("loggedInName", "ゲスト");
 			return "index";
