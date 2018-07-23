@@ -123,6 +123,45 @@
 			</div>
 		</div>
 	</div>
+	<c:if test="${isLoggedIn}">
+		<section class="bs-docs-section">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="page-header">
+						<h1 id="forms">時間割選択</h1>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-6">
+					<div class="bs-component">
+						<form:form method="get" action="./table">
+							<fieldset>
+								<c:if test="${timeTableArray.size() > 0}">
+									<div class="form-group">
+										<label for="requirednum">時間割を選択してください</label>
+										<select class="form-control" id="requirednum" name="requirednum">
+											<c:forEach items="${timeTableArray}" var="timeTable" begin="0" step="1"
+											           varStatus="i">
+												<option value="${i.index}">${timeTable.getTableName()}</option>
+											</c:forEach>
+										</select>
+									</div>
+								</c:if>
+								<div class="form-group">
+									<c:if test="${timeTableArray.size() > 0}">
+										<input id="select_button" type="submit" value="決定"/>
+									</c:if>
+									<a href="./makeup" class="button">
+										<input id="makeup_button" type="button" value="新規作成"/></a>
+								</div>
+							</fieldset>
+						</form:form>
+					</div>
+				</div>
+			</div>
+		</section>
+	</c:if>
 </div>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"

@@ -71,6 +71,7 @@ public class AlohaApplication {
 	}
 	
 	@RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
+	@Transactional
 	public String index(Model model) {
 		model.addAttribute("isLoggedIn", loginUserSession.isLoggedIn());
 		if (!loginUserSession.isLoggedIn()) {
@@ -78,6 +79,11 @@ public class AlohaApplication {
 			return "index";
 		} else {
 			model.addAttribute("loggedInName", loginUserSession.getLoggedInName());
+			if(Objects.isNull(loginUserSession.getData())){
+				loginUserSession.setData(repository.findOneByUserName(loginUserSession.getLoggedInName(), Data.class));
+			}
+			Data data = loginUserSession.getData();
+			model.addAttribute("timeTableArray", data.getTimeTableArray());
 			return "index";
 		}
 	}
