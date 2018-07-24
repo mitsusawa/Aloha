@@ -31,7 +31,6 @@ public class LessonArrayWrap {
 	}
 	
 	@OneToMany(targetEntity = Lesson.class)
-	@Embedded
 	@Column(nullable = false)
 	private List<Lesson> array;
 	

@@ -111,7 +111,6 @@
 				<h1 class="display-3">Aloha</h1>
 				<p class="lead">時間割管理サイト</p>
 				<hr>
-				<p>Aloha</p>
 			</div>
 		</div>
 	</div>
@@ -128,7 +127,7 @@
 			<div class="row">
 				<div class="col-lg-12">
 					<div class="page-header">
-						<h1 id="forms">時間割選択</h1>
+						<h1 id="selectForms">時間割選択</h1>
 					</div>
 				</div>
 			</div>
@@ -155,6 +154,70 @@
 									<a href="./makeup" class="button">
 										<input id="makeup_button" type="button" value="新規作成"/></a>
 								</div>
+							</fieldset>
+						</form:form>
+					</div>
+				</div>
+			</div>
+		</section>
+		<c:if test="${toDoList.size() > 0}">
+			<section class="bs-docs-section">
+				<div class="row">
+					<div class="col-lg-12">
+						<h2>ToDo</h2>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-4">
+						<div class="bs-component" style="display: inline-block">
+							<div class="card-columns">
+								<c:forEach items="${toDoList}" var="toDo" begin="0" step="1" varStatus="i">
+									<div class="card border-secondary mb-3" style="max-width: 20rem;">
+										<div class="card-header">
+											<form:form method="get" action="./todo_del">
+												<input type="hidden" name="deleteNum" id="deleteNum"
+												       value="${i.index}"/>
+												<input id="deleteToDo_button" type="submit" value="削除"/>
+											</form:form>
+										</div>
+										<div class="card-body text-secondary">
+											<h4 class="card-title">${toDo.getName()}</h4>
+											<p class="card-text">${toDo.getInfo()}</p>
+										</div>
+									</div>
+								</c:forEach>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</c:if>
+		<section class="bs-docs-section">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="page-header">
+						<h1 id="todoForms">新規ToDo</h1>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-6">
+					<div class="bs-component">
+						<form:form modelAttribute="makeUpToDoForm" action="./todo" method="post">
+							<fieldset>
+								<div class="form-group">
+									<label for="newToDoName">ToDo名</label>
+									<input type="text" class="form-control" id="newToDoName" name="newToDoName">
+								</div>
+								<div class="form-group">
+									<label for="newToDoInfo">詳細</label>
+									<textarea class="form-control" id="newToDoInfo" name="newToDoInfo"
+									          rows="3"></textarea>
+								</div>
+								<div class="form-group">
+									<input id="newToDo_button" type="submit" value="追加"/>
+								</div>
+								<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 							</fieldset>
 						</form:form>
 					</div>

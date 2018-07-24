@@ -3,11 +3,15 @@ package com.product.aloha;
 import com.product.aloha.Data.Data;
 import com.product.aloha.Data.Lesson;
 import com.product.aloha.Data.LessonArrayWrap;
+import com.product.aloha.Data.ToDo;
 import com.product.aloha.repositories.DataRepository;
 import com.product.aloha.repositories.LessonArrayWrapRepository;
 import com.product.aloha.repositories.LessonRepository;
 import com.product.aloha.repositories.TimeTableRepository;
 import com.product.aloha.repositories.ToDoRepository;
+import javassist.expr.Instanceof;
+import jdk.nashorn.api.tree.InstanceOfTree;
+import org.apache.logging.log4j.CloseableThreadContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -25,8 +29,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.util.HtmlUtils;
 
+import javax.validation.constraints.Min;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -34,6 +41,7 @@ import java.util.Objects;
 @SpringBootApplication
 @Controller
 @EnableAutoConfiguration
+@SessionAttributes("scopedTarget.loginUserSession")
 public class AlohaApplication {
 	
 	@Autowired
@@ -71,7 +79,7 @@ public class AlohaApplication {
 	}
 	
 	@RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
-	@Transactional
+	@Transactional(readOnly = false, rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
 	public String index(Model model) {
 		model.addAttribute("isLoggedIn", loginUserSession.isLoggedIn());
 		if (!loginUserSession.isLoggedIn()) {
@@ -83,7 +91,16 @@ public class AlohaApplication {
 				loginUserSession.setData(repository.findOneByUserName(loginUserSession.getLoggedInName(), Data.class));
 			}
 			Data data = loginUserSession.getData();
+			data.setToDoList(repository.findOneByUserName(loginUserSession.getLoggedInName(), Data.class).getToDoList());
+			if(Objects.isNull(data.getTimeTableArray())){
+				data.setTimeTableArray(new ArrayList<>());
+			}
+			if(Objects.isNull(data.getToDoList())){
+				data.setToDoList(new ArrayList<>());
+			}
+			repository.saveAndFlush(data);
 			model.addAttribute("timeTableArray", data.getTimeTableArray());
+			model.addAttribute("toDoList", data.getToDoList());
 			return "index";
 		}
 	}
@@ -115,13 +132,13 @@ public class AlohaApplication {
 			return "login";
 		} else {
 			model.addAttribute("loggedInName", loginUserSession.getLoggedInName());
-			return "index";
+			return "redirect:/index";
 		}
 	}
 	
 	@RequestMapping(value = {"/logout"})
-	public String logout() {
-		loginUserSession = new LoginUserSession();
+	public String logout(SessionStatus sessionStatus) {
+		sessionStatus.setComplete();
 		return "redirect:/index";
 	}
 	
@@ -131,7 +148,7 @@ public class AlohaApplication {
 			return "signup";
 		} else {
 			model.addAttribute("loggedInName", loginUserSession.getLoggedInName());
-			return "index";
+			return "redirect:/index";
 		}
 	}
 	
@@ -168,6 +185,12 @@ public class AlohaApplication {
 				try {
 					loginUserSession.getData().getTimeTableArray();
 				} catch (Exception e) {
+				
+				}
+				try{
+					loginUserSession.getData().getToDoList();
+				}catch (Exception e){
+				
 				}
 				return true;
 			} else {
@@ -288,6 +311,44 @@ public class AlohaApplication {
 		}
 	}
 	
+	@RequestMapping(value = {"/todo"}, method = RequestMethod.POST)
+	@Transactional(readOnly = false, rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+	public String makeUpToDoExec(Model model, @ModelAttribute("makeUpToDoForm") @Validated MakeUpToDoForm makeUpToDoForm, BindingResult result) {
+		if (loginUserSession.isLoggedIn()) {
+			String safeMakeUpToDoName = makeUpToDoForm.getNewToDoName();
+			String safeMakeUpToDoInfo = makeUpToDoForm.getNewToDoInfo();
+			Data data = repository.findOneByUserName(loginUserSession.getLoggedInName(), Data.class);
+			if(Objects.isNull(data.getToDoList())){
+				data.setToDoList(new ArrayList<>());
+			}
+			int toDoNum = data.getToDoList().size();
+			data.getToDoList().add(new ToDo());
+			data.getToDoList().get(toDoNum).setInfo(safeMakeUpToDoInfo);
+			data.getToDoList().get(toDoNum).setName(safeMakeUpToDoName);
+			toDoRepository.save(data.getToDoList().get(toDoNum));
+			repository.saveAndFlush(data);
+			return "redirect:/index";
+		} else {
+			return "redirect:/index";
+		}
+	}
+	
+	@RequestMapping(value = {"/todo_del"}, method = RequestMethod.GET)
+	@Transactional(readOnly = false, rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+	public String deleteToDoExec(Model model, @RequestParam("deleteNum") @Validated @Min(0) int deleteNum) {
+		if (loginUserSession.isLoggedIn()) {
+			Data data = repository.findOneByUserName(loginUserSession.getLoggedInName(), Data.class);
+			if(Objects.isNull(data.getToDoList())){
+				data.setToDoList(new ArrayList<>());
+			}
+			data.getToDoList().remove(deleteNum);
+			repository.saveAndFlush(data);
+			return "redirect:/index";
+		} else {
+			return "redirect:/index";
+		}
+	}
+	
 	@ModelAttribute("signUpForm")
 	public SignUpForm signUpForm() {
 		SignUpForm signUpForm = new SignUpForm();
@@ -304,6 +365,12 @@ public class AlohaApplication {
 	public MakeUpForm makeUpForm() {
 		MakeUpForm makeUpForm = new MakeUpForm();
 		return makeUpForm;
+	}
+	
+	@ModelAttribute("makeUpToDoForm")
+	public MakeUpToDoForm makeUpToDoForm() {
+		MakeUpToDoForm makeUpToDoForm = new MakeUpToDoForm();
+		return makeUpToDoForm;
 	}
 	
 	/*
