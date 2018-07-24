@@ -39,7 +39,7 @@ public class ToDo {
 	@Column(nullable=true)
 	private String info;
 	
-	@ManyToOne
+	@ManyToOne(targetEntity = Data.class)
 	private Data data;
 	
 	public String getName() {

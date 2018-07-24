@@ -1,5 +1,7 @@
 package com.product.aloha.Data;
 
+import org.hibernate.annotations.ListIndexBase;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -29,7 +31,9 @@ public class Data {
 	@NotEmpty
 	private String password;
 	
-	@OneToMany(targetEntity = ToDo.class)
+	@OneToMany(targetEntity = ToDo.class, cascade = CascadeType.ALL)
+	@Column(nullable = false)
+	@OrderBy
 	private List<ToDo> toDoList;
 	
 	public List<TimeTable> getTimeTableArray() {
@@ -49,11 +53,13 @@ public class Data {
 			setTimeTableArray(new ArrayList<TimeTable>());
 		}
 		if (Objects.isNull(getToDoList())){
-			setToDoList(new ArrayList<>());
+			setToDoList(new ArrayList<ToDo>());
 		}
 	}
 	
 	@OneToMany(targetEntity = TimeTable.class, cascade = CascadeType.ALL)
+	@Column(nullable = false)
+	@OrderBy
 	private List<TimeTable> timeTableArray;
 	
 	public String getUserName() {
