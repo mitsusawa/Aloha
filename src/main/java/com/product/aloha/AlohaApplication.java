@@ -1,17 +1,16 @@
 package com.product.aloha;
 
 import com.product.aloha.Data.Data;
+import com.product.aloha.Data.Friend;
 import com.product.aloha.Data.Lesson;
 import com.product.aloha.Data.LessonArrayWrap;
 import com.product.aloha.Data.ToDo;
 import com.product.aloha.repositories.DataRepository;
+import com.product.aloha.repositories.FriendRepository;
 import com.product.aloha.repositories.LessonArrayWrapRepository;
 import com.product.aloha.repositories.LessonRepository;
 import com.product.aloha.repositories.TimeTableRepository;
 import com.product.aloha.repositories.ToDoRepository;
-import javassist.expr.Instanceof;
-import jdk.nashorn.api.tree.InstanceOfTree;
-import org.apache.logging.log4j.CloseableThreadContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -57,16 +56,19 @@ public class AlohaApplication {
 	
 	private final ToDoRepository toDoRepository;
 	
+	private final FriendRepository friendRepository;
+	
 	@Autowired
 	PasswordEncoder passwordEncoder;
 	
 	@Autowired
-	public AlohaApplication(DataRepository repository, TimeTableRepository timeTableRepository, LessonArrayWrapRepository lessonArrayWrapRepository, LessonRepository lessonRepository, ToDoRepository toDoRepository) {
+	public AlohaApplication(DataRepository repository, TimeTableRepository timeTableRepository, LessonArrayWrapRepository lessonArrayWrapRepository, LessonRepository lessonRepository, ToDoRepository toDoRepository, FriendRepository friendRepository) {
 		this.repository = repository;
 		this.timeTableRepository = timeTableRepository;
 		this.lessonArrayWrapRepository = lessonArrayWrapRepository;
 		this.lessonRepository = lessonRepository;
 		this.toDoRepository = toDoRepository;
+		this.friendRepository = friendRepository;
 	}
 	
 	@Bean
@@ -87,18 +89,31 @@ public class AlohaApplication {
 			return "index";
 		} else {
 			model.addAttribute("loggedInName", loginUserSession.getLoggedInName());
-			if(Objects.isNull(loginUserSession.getData())){
+			if (Objects.isNull(loginUserSession.getData())) {
 				loginUserSession.setData(repository.findOneByUserName(loginUserSession.getLoggedInName(), Data.class));
 			}
 			Data data = loginUserSession.getData();
 			data.setToDoList(repository.findOneByUserName(loginUserSession.getLoggedInName(), Data.class).getToDoList());
-			if(Objects.isNull(data.getTimeTableArray())){
+			data.setFriendList(repository.findOneByUserName(loginUserSession.getLoggedInName(), Data.class).getFriendList());
+			if (Objects.isNull(data.getTimeTableArray())) {
 				data.setTimeTableArray(new ArrayList<>());
 			}
-			if(Objects.isNull(data.getToDoList())){
+			if (Objects.isNull(data.getToDoList())) {
 				data.setToDoList(new ArrayList<>());
 			}
+			int acceptableCount = 0;
+			int friendCount = 0;
+			for (Friend friend : data.getFriendList()) {
+				if (friend.getAcceptable()) {
+					acceptableCount++;
+				} else if (friend.getStatus()) {
+					friendCount++;
+				}
+			}
 			repository.saveAndFlush(data);
+			model.addAttribute("acceptableCount", acceptableCount);
+			model.addAttribute("friendCount", friendCount);
+			model.addAttribute("friendList", data.getFriendList());
 			model.addAttribute("timeTableArray", data.getTimeTableArray());
 			model.addAttribute("toDoList", data.getToDoList());
 			return "index";
@@ -187,9 +202,14 @@ public class AlohaApplication {
 				} catch (Exception e) {
 				
 				}
-				try{
+				try {
 					loginUserSession.getData().getToDoList();
-				}catch (Exception e){
+				} catch (Exception e) {
+				
+				}
+				try {
+					loginUserSession.getData().getFriendList();
+				} catch (Exception e) {
 				
 				}
 				return true;
@@ -315,10 +335,10 @@ public class AlohaApplication {
 	@Transactional(readOnly = false, rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
 	public String makeUpToDoExec(Model model, @ModelAttribute("makeUpToDoForm") @Validated MakeUpToDoForm makeUpToDoForm, BindingResult result) {
 		if (loginUserSession.isLoggedIn()) {
-			String safeMakeUpToDoName = makeUpToDoForm.getNewToDoName();
-			String safeMakeUpToDoInfo = makeUpToDoForm.getNewToDoInfo();
+			String safeMakeUpToDoName = HtmlUtils.htmlEscape(makeUpToDoForm.getNewToDoName());
+			String safeMakeUpToDoInfo = HtmlUtils.htmlEscape(makeUpToDoForm.getNewToDoInfo());
 			Data data = repository.findOneByUserName(loginUserSession.getLoggedInName(), Data.class);
-			if(Objects.isNull(data.getToDoList())){
+			if (Objects.isNull(data.getToDoList())) {
 				data.setToDoList(new ArrayList<>());
 			}
 			int toDoNum = data.getToDoList().size();
@@ -338,7 +358,7 @@ public class AlohaApplication {
 	public String deleteToDoExec(Model model, @RequestParam("deleteNum") @Validated @Min(0) int deleteNum) {
 		if (loginUserSession.isLoggedIn()) {
 			Data data = repository.findOneByUserName(loginUserSession.getLoggedInName(), Data.class);
-			if(Objects.isNull(data.getToDoList())){
+			if (Objects.isNull(data.getToDoList())) {
 				data.setToDoList(new ArrayList<>());
 			}
 			data.getToDoList().remove(deleteNum);
@@ -347,6 +367,129 @@ public class AlohaApplication {
 		} else {
 			return "redirect:/index";
 		}
+	}
+	
+	@RequestMapping(value = {"/friend"}, method = RequestMethod.POST)
+	@Transactional(readOnly = false, rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+	public String friendRequest(Model model, @ModelAttribute("friendRequestForm") @Validated FriendRequestForm friendRequestForm, BindingResult result) {
+		if (loginUserSession.isLoggedIn()) {
+			String safeFriendRequestName = HtmlUtils.htmlEscape(friendRequestForm.getFriendRequestName());
+			Data data = repository.findOneByUserName(loginUserSession.getLoggedInName(), Data.class);
+			if (Objects.isNull(data.getFriendList())) {
+				data.setFriendList(new ArrayList<>());
+			}
+			int friendNum = data.getFriendList().size();
+			Data reciveData;
+			int reciveNum;
+			boolean flag = false;
+			for (Friend friend : data.getFriendList()) {
+				if (friend.getName().equals(safeFriendRequestName)) {
+					flag = true;
+				}
+			}
+			if (repository.findByUserName(safeFriendRequestName).size() > 0 && !flag && !safeFriendRequestName.equals(loginUserSession.getLoggedInName())) {
+				data.getFriendList().add(new Friend());
+				data.getFriendList().get(friendNum).setName(safeFriendRequestName);
+				reciveData = repository.findOneByUserName(safeFriendRequestName, Data.class);
+				if (Objects.isNull(reciveData.getFriendList())) {
+					reciveData.setFriendList(new ArrayList<>());
+				}
+				reciveNum = reciveData.getFriendList().size();
+				reciveData.getFriendList().add(new Friend());
+				reciveData.getFriendList().get(reciveNum).setName(data.getUserName());
+				reciveData.getFriendList().get(reciveNum).setAcceptable(true);
+				friendRepository.save(data.getFriendList().get(friendNum));
+				friendRepository.save(reciveData.getFriendList().get(reciveNum));
+				repository.saveAndFlush(data);
+			}
+			return "redirect:/index";
+		} else {
+			return "redirect:/index";
+		}
+	}
+	
+	@RequestMapping(value = {"/accept"}, method = RequestMethod.POST)
+	@Transactional(readOnly = false, rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+	public String acceptOrRefuse(Model model, @ModelAttribute("friendRequestForm") @Validated AcceptForm acceptForm, BindingResult result) {
+		if (loginUserSession.isLoggedIn()) {
+			boolean acceptFlag = Boolean.parseBoolean(HtmlUtils.htmlEscape(acceptForm.getAcceptFlag()));
+			int friendAcceptNum = Integer.parseInt(HtmlUtils.htmlEscape(acceptForm.getFriendAcceptNum()));
+			Data data = repository.findOneByUserName(loginUserSession.getLoggedInName(), Data.class);
+			if (Objects.isNull(data.getFriendList())) {
+				data.setToDoList(new ArrayList<>());
+			}
+			try {
+				if (acceptFlag) {
+					if (repository.findByUserName(data.getFriendList().get(Integer.parseInt(HtmlUtils.htmlEscape(acceptForm.getFriendAcceptNum()))).getName()).size() > 0) {
+						data.getFriendList().get(friendAcceptNum).setStatus(true);
+						data.getFriendList().get(friendAcceptNum).setAcceptable(false);
+						Data anotherData = repository.findOneByUserName(data.getFriendList().get(Integer.parseInt(HtmlUtils.htmlEscape(acceptForm.getFriendAcceptNum()))).getName(), Data.class);
+						Friend anotherFriend = null;
+						for (int i = 0; i < anotherData.getFriendList().size(); i++) {
+							if (anotherData.getFriendList().get(i).getName().equals(loginUserSession.getLoggedInName())) {
+								anotherFriend = anotherData.getFriendList().get(i);
+								break;
+							}
+						}
+						if (!Objects.isNull(anotherFriend)) {
+							anotherFriend.setAcceptable(false);
+							anotherFriend.setStatus(true);
+						}
+						friendRepository.save(data.getFriendList().get(friendAcceptNum));
+						friendRepository.save(anotherFriend);
+						repository.saveAndFlush(data);
+					}
+				} else {
+					data.getFriendList().remove(friendAcceptNum);
+					Data anotherData = repository.findOneByUserName(data.getFriendList().get(friendAcceptNum).getName(), Data.class);
+					for (int i = 0; i < anotherData.getFriendList().size(); i++) {
+						if (anotherData.getFriendList().get(i).getName().equals(loginUserSession.getLoggedInName())) {
+							anotherData.getFriendList().remove(i);
+							break;
+						}
+					}
+				}
+			} catch (Exception e) {
+			
+			}
+			repository.saveAndFlush(data);
+			return "redirect:/index";
+		} else {
+			return "redirect:/index";
+		}
+	}
+	
+	@RequestMapping(value = {"/send"}, method = RequestMethod.POST)
+	@Transactional(readOnly = false, rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+	public String copySentTable(Model model, @ModelAttribute("sendForm") @Validated SendForm sendForm, BindingResult result) {
+		if (loginUserSession.isLoggedIn()) {
+			int safeFriendNum = Integer.parseInt(HtmlUtils.htmlEscape(sendForm.getSendFriendNum()));
+			int safeTableNum = Integer.parseInt(HtmlUtils.htmlEscape(sendForm.getSendTableNum()));
+			int index;
+			Data data = repository.findOneByUserName(loginUserSession.getLoggedInName(), Data.class);
+			if (repository.findByUserName(data.getFriendList().get(safeFriendNum).getName()).size() > 0) {
+				Data anotherData = repository.findOneByUserName(data.getFriendList().get(safeFriendNum).getName(), Data.class);
+				if (Objects.isNull(anotherData.getTimeTableArray())) {
+					anotherData.setTimeTableArray(new ArrayList<>());
+				}
+				index = anotherData.getTimeTableArray().size();
+				anotherData.getTimeTableArray().add(data.getTimeTableArray().get(safeTableNum).clone());
+				for (LessonArrayWrap lessonArrayWrap : anotherData.getTimeTableArray().get(index).getLessonArrayWrap()) {
+					lessonArrayWrapRepository.save(lessonArrayWrap);
+					for (Lesson lesson : lessonArrayWrap.getArray()) {
+						lessonRepository.save(lesson);
+					}
+				}
+				timeTableRepository.save(anotherData.getTimeTableArray().get(index));
+				repository.saveAndFlush(anotherData);
+			}
+			return "redirect:/index";
+		} else
+		
+		{
+			return "redirect:/index";
+		}
+		
 	}
 	
 	@ModelAttribute("signUpForm")

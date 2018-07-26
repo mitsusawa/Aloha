@@ -8,16 +8,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.time.Duration;
 
 @Entity
-public class Lesson {
+public class Lesson implements Cloneable, Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(nullable = false, unique = true)
 	@NotNull
 	private Long id;
 	
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	public Long getId() {
 		return id;
 	}
@@ -63,5 +65,14 @@ public class Lesson {
 	
 	public Lesson() {
 		name = "未入力";
+	}
+	
+	@Override
+	public Lesson clone(){
+		Lesson lesson = new Lesson();
+		lesson.setName(this.getName());
+		lesson.setEndTime(this.getEndTime());
+		lesson.setStartTime(this.getEndTime());
+		return lesson;
 	}
 }

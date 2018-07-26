@@ -8,10 +8,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.time.Duration;
 
 @Entity
-public class ToDo implements Cloneable, Serializable {
+public class Friend implements Cloneable, Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(nullable = false, unique = true)
@@ -29,16 +28,8 @@ public class ToDo implements Cloneable, Serializable {
 	@Column(nullable = true)
 	private String name;
 	
-	public String getInfo() {
-		return info;
-	}
-	
-	public void setInfo(String info) {
-		this.info = info;
-	}
-	
-	@Column(nullable=true)
-	private String info;
+	@Column(nullable = false)
+	private Boolean acceptable;
 	
 	@ManyToOne(targetEntity = Data.class)
 	private Data data;
@@ -47,12 +38,40 @@ public class ToDo implements Cloneable, Serializable {
 		return name;
 	}
 	
+	public Boolean getAcceptable() {
+		return acceptable;
+	}
+	
+	public void setAcceptable(Boolean acceptable) {
+		this.acceptable = acceptable;
+	}
+	
+	public Data getData() {
+		return data;
+	}
+	
+	public void setData(Data data) {
+		this.data = data;
+	}
+	
+	public Boolean getStatus() {
+		return status;
+	}
+	
+	public void setStatus(Boolean status) {
+		this.status = status;
+	}
+	
 	public void setName(String name) {
 		this.name = name;
 	}
 	
-	public ToDo() {
+	@Column(nullable = false)
+	private Boolean status;
+	
+	public Friend() {
 		name = "";
-		info = "";
+		status = false;
+		acceptable = false;
 	}
 }
