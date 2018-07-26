@@ -97,9 +97,11 @@ public class AlohaApplication {
 			data.setFriendList(repository.findOneByUserName(loginUserSession.getLoggedInName(), Data.class).getFriendList());
 			if (Objects.isNull(data.getTimeTableArray())) {
 				data.setTimeTableArray(new ArrayList<>());
+				repository.saveAndFlush(data);
 			}
 			if (Objects.isNull(data.getToDoList())) {
 				data.setToDoList(new ArrayList<>());
+				repository.saveAndFlush(data);
 			}
 			int acceptableCount = 0;
 			int friendCount = 0;
