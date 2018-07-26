@@ -471,6 +471,7 @@ public class AlohaApplication {
 				Data anotherData = repository.findOneByUserName(data.getFriendList().get(safeFriendNum).getName(), Data.class);
 				if (Objects.isNull(anotherData.getTimeTableArray())) {
 					anotherData.setTimeTableArray(new ArrayList<>());
+					repository.saveAndFlush(anotherData);
 				}
 				index = anotherData.getTimeTableArray().size();
 				anotherData.getTimeTableArray().add(data.getTimeTableArray().get(safeTableNum).clone());
