@@ -224,6 +224,124 @@
 				</div>
 			</div>
 		</section>
+		<c:if test="${acceptableCount > 0}">
+			<section class="bs-docs-section">
+				<div class="row">
+					<div class="col-lg-6">
+						<div class="bs-component">
+							<div class="alert alert-dismissible alert-primary">
+								<button type="button" class="close" data-dismiss="alert">&times;</button>
+								新しいフレンドリクエストが届いています!
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="page-header">
+							<h1 id="acceptForm">フレンドリクエスト一覧</h1>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-6">
+						<div class="bs-component">
+							<form:form modelAttribute="acceptForm" method="post" action="./accept">
+								<fieldset>
+									<div class="form-group">
+										<label for="friendAccept">フレンド登録を許可しますか?</label>
+										<select class="form-control" id="friendAcceptNum" name="friendAcceptNum">
+											<c:forEach items="${friendList}" var="friend" begin="0" step="1"
+											           varStatus="i">
+												<option value="${i.index}">${friend.getName()}</option>
+											</c:forEach>
+										</select>
+									</div>
+									<div class="form-group">
+										<input id="accept_button" name="acceptFlag" type="radio" value="true">受諾
+										<input id="refuse_button" name="acceptFlag" type="radio" value="false"
+										       checked="checked">拒否
+										<br>
+										<input id="accept_submit" type="submit" value="送信"/>
+									</div>
+									<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+								</fieldset>
+							</form:form>
+						</div>
+					</div>
+				</div>
+			</section>
+		</c:if>
+		<c:if test="${friendCount > 0 && timeTableArray.size() > 0}">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="page-header">
+						<h1 id="sendForm">フレンドに時間割を送信</h1>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-6">
+					<div class="bs-component">
+						<form:form modelAttribute="sendForm" method="post" action="./send">
+							<fieldset>
+								<div class="form-group">
+									<label for="sendForm">受け取るフレンドを選択</label>
+									<select class="form-control" id="sendFriendNum" name="sendFriendNum">
+										<c:forEach items="${friendList}" var="friend" begin="0" step="1"
+										           varStatus="i">
+											<option value="${i.index}">${friend.getName()}</option>
+										</c:forEach>
+									</select>
+								</div>
+								<div class="form-group">
+									<label for="requirednum">時間割を選択してください</label>
+									<select class="form-control" id="sendTableNum" name="sendTableNum">
+										<c:forEach items="${timeTableArray}" var="timeTable" begin="0" step="1"
+										           varStatus="i">
+											<option value="${i.index}">${timeTable.getTableName()}</option>
+										</c:forEach>
+									</select>
+								</div>
+								<div class="form-group">
+									<input id="send_submit" type="submit" value="送信"/>
+								</div>
+								<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+							</fieldset>
+						</form:form>
+					</div>
+				</div>
+			</div>
+			</section>
+		</c:if>
+		<section class="bs-docs-section">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="page-header">
+						<h1 id="friendRequestForms">フレンド申請フォーム</h1>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-6">
+					<div class="bs-component">
+						<form:form modelAttribute="friendRequestForm" action="./friend" method="post">
+							<fieldset>
+								<div class="form-group">
+									<label for="newToDoName">ユーザ名</label>
+									<input type="text" class="form-control" id="friendRequestName"
+									       name="friendRequestName">
+								</div>
+								<div class="form-group">
+									<input id="friendRequest_button" type="submit" value="申請"/>
+								</div>
+								<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+							</fieldset>
+						</form:form>
+					</div>
+				</div>
+			</div>
+		</section>
 	</c:if>
 </div>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"

@@ -5,13 +5,14 @@ import org.hibernate.annotations.ListIndexBase;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
 @Table(name = "data")
-public class Data {
+public class Data  implements Cloneable, Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(nullable = false, unique = true)
@@ -27,6 +28,14 @@ public class Data {
 	@NotEmpty
 	private String userName;
 	
+	public List<Friend> getFriendList() {
+		return friendList;
+	}
+	
+	public void setFriendList(List<Friend> friendList) {
+		this.friendList = friendList;
+	}
+	
 	@Column(length = 512, nullable = true)
 	@NotEmpty
 	private String password;
@@ -35,6 +44,11 @@ public class Data {
 	@Column(nullable = false)
 	@OrderBy
 	private List<ToDo> toDoList;
+	
+	@OneToMany(targetEntity = Friend.class, cascade = CascadeType.ALL)
+	@Column(nullable = false)
+	@OrderBy
+	private List<Friend> friendList;
 	
 	public List<TimeTable> getTimeTableArray() {
 		return timeTableArray;

@@ -41,6 +41,8 @@ dependencies {
     compile('javax.xml.bind:jaxb-api')
     compile('javax.activation:activation')
     compile('org.apache.tomcat.embed:tomcat-embed-jasper')
+    compile('com.google.guava:guava:25.1-jre')
+    compile('org.apache.commons:commons-lang3')
     providedCompile('javax.servlet:jstl')
     runtime('org.springframework.boot:spring-boot-devtools')
     runtime('mysql:mysql-connector-java')
