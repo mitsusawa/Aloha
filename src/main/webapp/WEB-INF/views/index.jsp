@@ -253,7 +253,9 @@
 										<select class="form-control" id="friendAcceptNum" name="friendAcceptNum">
 											<c:forEach items="${friendList}" var="friend" begin="0" step="1"
 											           varStatus="i">
-												<option value="${i.index}">${friend.getName()}</option>
+												<c:if test="${friend.getAcceptable()}">
+													<option value="${i.index}">${friend.getName()}</option>
+												</c:if>
 											</c:forEach>
 										</select>
 									</div>
@@ -276,7 +278,7 @@
 			<div class="row">
 				<div class="col-lg-12">
 					<div class="page-header">
-						<h1 id="sendForm">フレンドに時間割を送信</h1>
+						<h1 id="sendForm">フレンドと時間割を共有</h1>
 					</div>
 				</div>
 			</div>
