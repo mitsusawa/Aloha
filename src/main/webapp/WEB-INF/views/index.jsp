@@ -168,7 +168,7 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-lg-4">
+					<div class="col-lg-12">
 						<div class="bs-component" style="display: inline-block">
 							<div class="card-columns">
 								<c:forEach items="${toDoList}" var="toDo" begin="0" step="1" varStatus="i">
