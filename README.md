@@ -27,7 +27,7 @@ Aloha is time table management web application for students. Usable language is 
 1. `./src/main/resources/application.yml`にRDBの設定をしてください。 
 2. それをGradleでビルドしてください。
 3. `./build`ディレクトリにwarファイルが出来上がっている事を確認してください。
-4. その後、warファイルをリネーム(任意)し、デプロイしてください。(e.g. Tomcat: `webapps` フォルダ等に)
+4. その後、warファイルをリネーム(任意)し、デプロイしてください。(e.g. Tomcat: `webapps` ディレクトリ等に)
 5. デフォルトの設定であれば、 `http://(FQDN)/(ファイル名)/index` にアクセスすれば使用可能です。
 
 ## Licence
