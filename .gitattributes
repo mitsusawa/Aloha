@@ -1,1 +1,3 @@
-src/main/resources/static/* linguist-documentation
+src/main/resources/static/js/* linguist-documentation
+src/main/resources/static/fonts/* linguist-documentation
+src/main/resources/static/css/* linguist-documentation
